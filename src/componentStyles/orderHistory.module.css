@@ -1,0 +1,22 @@
+.orderHistory {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.orderDetailsContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.orderDetails {
+  display: flex;
+  width: 45%;
+  justify-content: space-between;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  width: 20%;
+}
