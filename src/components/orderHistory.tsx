@@ -62,13 +62,13 @@ export default function OrderHistory() {
               </div>
               <div className={styles.actionButtons}>
                 <ActionButton
-                  type="contained"
+                  variant="contained"
                   label="View Order"
                   color="primary"
                   buttonClick={() => setOpenOrder(true)}
                 />
                 <ActionButton
-                  type="contained"
+                  variant="contained"
                   label="View Invoice"
                   color="primary"
                 />
@@ -113,12 +113,12 @@ export default function OrderHistory() {
               </div>
               <div className={styles.actionButtons}>
                 <ActionButton
-                  type="contained"
+                  variant="contained"
                   label="View Order"
                   color="primary"
                 />
                 <ActionButton
-                  type="contained"
+                  variant="contained"
                   label="View Invoice"
                   color="primary"
                 />
@@ -163,12 +163,12 @@ export default function OrderHistory() {
               </div>
               <div className={styles.actionButtons}>
                 <ActionButton
-                  type="contained"
+                  variant="contained"
                   label="View Order"
                   color="primary"
                 />
                 <ActionButton
-                  type="contained"
+                  variant="contained"
                   label="View Invoice"
                   color="primary"
                 />

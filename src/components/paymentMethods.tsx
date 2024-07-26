@@ -19,7 +19,7 @@ export default function PaymentMethods() {
         <h3>Credit Card(s)</h3>
         <p>Manage your credit cards and payment options.</p>
         <ActionButton
-          type="contained"
+          variant="contained"
           label="Add Payment Method"
           color="primary"
         />

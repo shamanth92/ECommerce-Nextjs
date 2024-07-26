@@ -20,9 +20,13 @@ export const AccountActions: React.FC<AccountActionProps> = ({
         <ClearIcon />
       </Tooltip>
       {defaultProperty ? (
-        <ActionButton type="outlined" label="Default" color="secondary" />
+        <ActionButton variant="outlined" label="Default" color="secondary" />
       ) : (
-        <ActionButton type="contained" label="Set as Default" color="primary" />
+        <ActionButton
+          variant="contained"
+          label="Set as Default"
+          color="primary"
+        />
       )}
     </>
   );

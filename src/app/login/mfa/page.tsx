@@ -1,9 +1,12 @@
+"use client";
 import { TextField, Button } from "@mui/material";
 import styles from "./mfa.module.css";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const codes = [1, 2, 3, 4, 5, 6];
+  const router = useRouter();
 
   const codeFields = codes.map((a) => (
     <TextField
@@ -25,8 +28,18 @@ export default function Login() {
       </p>
       <div className={styles.mfa}>{codeFields}</div>
       <div className={styles.actions}>
-        <ActionButton type="outlined" label="Cancel" color="secondary" />
-        <ActionButton type="contained" label="Continue" color="primary" />
+        <ActionButton
+          variant="outlined"
+          label="Cancel"
+          color="secondary"
+          buttonClick={() => router.push("/login")}
+        />
+        <ActionButton
+          variant="contained"
+          label="Continue"
+          color="primary"
+          buttonClick={() => router.push("/products")}
+        />
       </div>
     </div>
   );

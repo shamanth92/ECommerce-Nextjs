@@ -11,6 +11,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import HomeIcon from "@mui/icons-material/Home";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import Link from "next/link";
 
 export const AppHeader = () => {
   return (
@@ -53,11 +54,17 @@ export const AppHeader = () => {
                 width: "65%",
               }}
             >
-              <HomeIcon fontSize="large" color="secondary" />
-              <FavoriteIcon fontSize="large" />
-              <Badge badgeContent={4} color="error">
-                <ShoppingBagIcon fontSize="large" />
-              </Badge>
+              <Link href="/products">
+                <HomeIcon fontSize="large" color="secondary" />
+              </Link>
+              <Link href="/products/favorites">
+                <FavoriteIcon fontSize="large" color="secondary" />
+              </Link>
+              <Link href="/products/checkout">
+                <Badge badgeContent={4} color="error">
+                  <ShoppingBagIcon fontSize="large" color="secondary" />
+                </Badge>
+              </Link>
             </Box>
             <Avatar>SP</Avatar>
           </Box>

@@ -9,8 +9,7 @@ import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
 export default function Login() {
-  // const router = useRouter();
-  // const { pending, data } = useFormStatus();
+  const router = useRouter();
   type Inputs = {
     username: string;
     password: string;
@@ -27,7 +26,9 @@ export default function Login() {
       password: "",
     },
   });
-  const onSubmit: SubmitHandler<Inputs> = (data) => {};
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    router.push("/login/mfa");
+  };
 
   return (
     <div className={styles.container}>
