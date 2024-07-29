@@ -1,14 +1,16 @@
 "use client";
-import { TextField, Box, Link } from "@mui/material";
-import Button from "@mui/material/Button";
+import { TextField, Box, Link, Alert, CircularProgress } from "@mui/material";
 import styles from "./login.module.css";
 import Register from "@/components/register";
-// import Link from "next/link";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
 
 export default function Login() {
+  const [loginError, setLoginError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   type Inputs = {
     username: string;
@@ -19,6 +21,7 @@ export default function Login() {
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
@@ -27,7 +30,25 @@ export default function Login() {
     },
   });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    router.push("/login/mfa");
+    setLoginError(false);
+    setLoading(true);
+    const auth = getAuth();
+    // setTimeout(() => {
+    signInWithEmailAndPassword(auth, data.username, data.password)
+      .then((userCredential) => {
+        setLoginError(false);
+        const user = userCredential.user;
+        router.push("/login/mfa");
+        setLoading(false);
+        reset();
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setLoading(false);
+        setLoginError(true);
+      });
+    // }, 1000);
   };
 
   return (
@@ -69,14 +90,25 @@ export default function Login() {
                   />
                 )}
               />
-              <ActionButton
-                variant="contained"
-                label="Login"
-                color="primary"
-                type="submit"
-              />
+              {!loading ? (
+                <ActionButton
+                  variant="contained"
+                  label="Login"
+                  color="primary"
+                  type="submit"
+                />
+              ) : (
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <CircularProgress />
+                </Box>
+              )}
             </div>
           </form>
+          {loginError && (
+            <Box sx={{ paddingTop: "10px" }}>
+              <Alert severity="error">Invalid Login Credentials</Alert>
+            </Box>
+          )}
         </div>
         <div className={styles.forgot}>
           <Link underline="hover">Forgot Password</Link>

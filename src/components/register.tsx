@@ -9,15 +9,22 @@ import {
   Button,
   Snackbar,
   Alert,
+  Box,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import styles from "./../componentStyles/register.module.css";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { app } from "@/firebase/initialize";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Register() {
   const [registerUser, setRegister] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [registerError, showRegisterError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   type Inputs = {
     fullName: string;
@@ -29,7 +36,9 @@ export default function Register() {
   const {
     control,
     handleSubmit,
-    watch,
+    setError,
+    clearErrors,
+    reset,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
@@ -40,7 +49,31 @@ export default function Register() {
     },
   });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    if (data.password !== data.confirmpassword) {
+    if (data.password === data.confirmpassword) {
+      clearErrors("confirmpassword");
+      setLoading(true);
+      const auth = getAuth(app);
+      createUserWithEmailAndPassword(auth, data.email, data.password)
+        .then((userCredential) => {
+          // Signed up
+          setShowSnackbar(true);
+          setRegister(false);
+          showRegisterError(false);
+          setLoading(false);
+          const user = userCredential.user;
+          reset();
+        })
+        .catch((error) => {
+          setLoading(false);
+          showRegisterError(true);
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
+    } else {
+      setError("confirmpassword", {
+        type: "manual",
+        message: "Passwords do not match!",
+      });
     }
   };
 
@@ -147,12 +180,16 @@ export default function Register() {
               color="secondary"
               buttonClick={() => setRegister(false)}
             ></ActionButton>
-            <ActionButton
-              variant="contained"
-              label="Register"
-              color="primary"
-              type="submit"
-            ></ActionButton>
+            {!loading ? (
+              <ActionButton
+                variant="contained"
+                label="Register"
+                color="primary"
+                type="submit"
+              ></ActionButton>
+            ) : (
+              <CircularProgress />
+            )}
           </DialogActions>
         </form>
       </Dialog>
@@ -165,9 +202,13 @@ export default function Register() {
         autoHideDuration={6000}
         onClose={() => setShowSnackbar(false)}
       >
-        <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
-          User registered! Login to Continue.
-        </Alert>
+        {!registerError ? (
+          <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
+            User registered! Login to Continue.
+          </Alert>
+        ) : (
+          <Alert severity="error">Registration Failed!</Alert>
+        )}
       </Snackbar>
     </>
   );
