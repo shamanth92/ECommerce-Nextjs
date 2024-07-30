@@ -11,12 +11,12 @@
 .mfa {
   display: flex;
   justify-content: space-between;
-  width: 35%;
+  /* width: 35%; */
   padding: 30px;
 }
 
 .actions {
   display: flex;
-  justify-content: space-between;
-  width: 15%;
+  justify-content: space-evenly;
+  /* width: 15%; */
 }

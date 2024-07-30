@@ -1,23 +1,81 @@
 "use client";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Typography } from "@mui/material";
 import styles from "./mfa.module.css";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useRouter } from "next/navigation";
+import {
+  useForm,
+  SubmitHandler,
+  Controller,
+  useFieldArray,
+} from "react-hook-form";
+import { useState } from "react";
 
 export default function Login() {
-  const codes = [1, 2, 3, 4, 5, 6];
+  const codes = ["field1", "field2", "field3", "field4", "field5", "field6"];
   const router = useRouter();
+  const [mfaError, setMFAError] = useState(false);
 
-  const codeFields = codes.map((a) => (
-    <TextField
+  const {
+    control,
+    handleSubmit,
+    setError,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      field1: "",
+      field2: "",
+      field3: "",
+      field4: "",
+      field5: "",
+      field6: "",
+    },
+  });
+
+  const showErrors = (e: any, a: any) => {
+    if (e[a]) {
+      setMFAError(true);
+    }
+    return e[a] ? true : false;
+  };
+
+  const handleKeyPress = (event: any, nextFieldId: string) => {
+    if (event.target.value.length === 1) {
+      document.getElementById(nextFieldId)?.focus();
+    }
+  };
+
+  const codeFields = codes.map((a, i) => (
+    <Controller
       key={a}
-      variant="outlined"
-      inputProps={{
-        maxLength: 1,
-        style: { width: "50px", fontWeight: "bold", textAlign: "center" },
-      }}
+      name={a as any}
+      control={control}
+      rules={{ required: true }}
+      render={({ field }) => (
+        <TextField
+          {...field}
+          id={a}
+          variant="outlined"
+          error={showErrors(errors, a)}
+          onChange={(e) => {
+            field.onChange(e);
+            handleKeyPress(e, codes[i + 1]);
+          }}
+          inputProps={{
+            maxLength: 1,
+            style: { width: "50px", fontWeight: "bold", textAlign: "center" },
+          }}
+        />
+      )}
     />
   ));
+
+  const onSubmit: SubmitHandler<any> = (data) => {
+    setMFAError(false);
+    router.push("/products");
+  };
 
   return (
     <div className={styles.mfaContainer}>
@@ -26,21 +84,34 @@ export default function Login() {
         Enter below the 6-digit authentication sent to your phone number ending
         with ****
       </p>
-      <div className={styles.mfa}>{codeFields}</div>
-      <div className={styles.actions}>
-        <ActionButton
-          variant="outlined"
-          label="Cancel"
-          color="secondary"
-          buttonClick={() => router.push("/login")}
-        />
-        <ActionButton
-          variant="contained"
-          label="Continue"
-          color="primary"
-          buttonClick={() => router.push("/products")}
-        />
-      </div>
+      {mfaError && (
+        <Typography sx={{ color: "red" }}>
+          Please enter a valid 6-digit code
+        </Typography>
+      )}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        style={{ width: "40%" }}
+      >
+        <div>
+          <div className={styles.mfa}>{codeFields}</div>
+          <div className={styles.actions}>
+            <ActionButton
+              variant="outlined"
+              label="Cancel"
+              color="secondary"
+              buttonClick={() => router.push("/login")}
+            />
+            <ActionButton
+              variant="contained"
+              label="Continue"
+              color="primary"
+              type="submit"
+            />
+          </div>
+        </div>
+      </form>
     </div>
   );
 }
