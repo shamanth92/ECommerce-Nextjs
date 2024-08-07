@@ -1,19 +1,15 @@
 import { create } from 'zustand'
 
 type State = {
-    firstName: string
-    lastName: string
+    productSelect: any;
   }
   
   type Action = {
-    updateFirstName: (firstName: State['firstName']) => void
-    updateLastName: (lastName: State['lastName']) => void
+    updateProductSelect: (firstName: State['productSelect']) => void
   }
   
   // Create your store, which includes both state and (optionally) actions
   export const useAppStore = create<State & Action>((set) => ({
-    firstName: '',
-    lastName: '',
-    updateFirstName: (firstName) => set(() => ({ firstName: firstName })),
-    updateLastName: (lastName) => set(() => ({ lastName: lastName })),
+    productSelect: {},
+    updateProductSelect: (productSelect) => set(() => ({ productSelect: productSelect })),
   }))
