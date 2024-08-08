@@ -8,13 +8,15 @@ import {
   Divider,
   Grid,
   Typography,
+  CardActionArea,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 interface ProductsProps {
   products: [Products];
 }
 
-interface Products {
+export interface Products {
   id: number;
   title: string;
   price: number;
@@ -27,30 +29,33 @@ interface Products {
 export const AllProducts: React.FC<ProductsProps> = ({ products }) => {
   const productSelect = useAppStore((state) => state.productSelect);
   const updateProductSelect = useAppStore((state) => state.updateProductSelect);
+  const router = useRouter();
 
   const allProducts = products.map((p: Products) => (
     <Grid item xs={3} key={p.id}>
       <Card
-        sx={{ height: "435px", cursor: "pointer" }}
+        sx={{ height: "400px", cursor: "pointer" }}
         elevation={productSelect?.id === p.id ? 10 : 2}
         onMouseEnter={() => updateProductSelect({ id: p.id })}
         onMouseLeave={() => updateProductSelect({})}
       >
-        <Container
-          sx={{ display: "flex", justifyContent: "center", padding: "20px" }}
-        >
-          <Box
-            component="img"
-            height="280px"
-            width="50%"
-            alt="The house from the offer."
-            src={p.image}
-          />
-        </Container>
-        <Divider />
-        <CardContent sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography>{p.title}</Typography>
-        </CardContent>
+        <CardActionArea onClick={() => router.push(`/products/${p.id}`)}>
+          <Container
+            sx={{ display: "flex", justifyContent: "center", padding: "20px" }}
+          >
+            <Box
+              component="img"
+              height="280px"
+              width="50%"
+              alt="The house from the offer."
+              src={p.image}
+            />
+          </Container>
+          <Divider />
+          <CardContent sx={{ display: "flex", justifyContent: "center" }}>
+            <Typography>{p.title}</Typography>
+          </CardContent>
+        </CardActionArea>
       </Card>
     </Grid>
   ));

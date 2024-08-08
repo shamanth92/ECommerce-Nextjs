@@ -24,7 +24,12 @@ export const ActionButton: React.FC<ButtonProps> = ({
   };
 
   return type !== "submit" ? (
-    <Button variant={variant} color={color} onClick={handleButtonClick}>
+    <Button
+      variant={variant}
+      color={color}
+      onClick={handleButtonClick}
+      disabled={disabled}
+    >
       {label}
     </Button>
   ) : (
