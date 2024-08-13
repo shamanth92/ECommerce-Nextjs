@@ -15,6 +15,7 @@ import {
 import { Products } from "./allProducts";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useState } from "react";
+import { useAppStore } from "@/zustand/store";
 
 interface ProductProps {
   productDetails: Products;
@@ -22,6 +23,20 @@ interface ProductProps {
 
 export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const [quantity, setQuantity] = useState(1);
+  const checkoutItems = useAppStore((state) => state.checkoutItems);
+  const itemsInCart = useAppStore((state) => state.itemsInCart);
+  const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
+  const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
+
+  const updateCheckoutIcon = () => {
+    updateCheckoutItems(
+      checkoutItems === 0 ? quantity : checkoutItems + quantity
+    );
+    updateItemsInCart([
+      ...itemsInCart,
+      { product: productDetails, quantity: quantity },
+    ]);
+  };
   return (
     <Box
       sx={{
@@ -101,6 +116,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
                   variant="contained"
                   label="Add to Cart"
                   color="primary"
+                  buttonClick={() => updateCheckoutIcon()}
                 />
               </Box>
             </Box>

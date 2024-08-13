@@ -1,3 +1,4 @@
+"use client";
 import {
   AppBar,
   Toolbar,
@@ -12,8 +13,11 @@ import HomeIcon from "@mui/icons-material/Home";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import Link from "next/link";
+import { useAppStore } from "@/zustand/store";
 
 export const AppHeader = () => {
+  const checkoutItems = useAppStore((state) => state.checkoutItems);
+
   return (
     <AppBar position="sticky">
       <Toolbar>
@@ -61,7 +65,7 @@ export const AppHeader = () => {
                 <FavoriteIcon fontSize="large" color="secondary" />
               </Link>
               <Link href="/products/checkout">
-                <Badge badgeContent={4} color="error">
+                <Badge badgeContent={checkoutItems} color="error">
                   <ShoppingBagIcon fontSize="large" color="secondary" />
                 </Badge>
               </Link>
