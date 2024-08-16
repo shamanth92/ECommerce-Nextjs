@@ -1,3 +1,4 @@
+"use client";
 import {
   Box,
   Card,
@@ -11,9 +12,16 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { ItemsInCart, useAppStore } from "@/zustand/store";
+import { useRouter } from "next/navigation";
 
 export const OrderSummary = () => {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
+  const checkoutItems = useAppStore((state) => state.checkoutItems);
+  const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
+  const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
+  const router = useRouter();
+
+  const priceTypes = ["Subtotal", "Taxes", "Total"];
 
   const orderSummary = itemsInCart.map((item) => (
     <Box
@@ -43,6 +51,7 @@ export const OrderSummary = () => {
               justifyContent: "space-between",
               flexDirection: "column",
             }}
+            onClick={() => router.push(`/products/${item.product.id}`)}
           >
             <Typography sx={{ fontWeight: "bold" }}>
               {item.product.title}
@@ -59,8 +68,10 @@ export const OrderSummary = () => {
               alignItems: "center",
             }}
           >
-            <Tooltip title="Delete">
-              <CloseIcon />
+            <Tooltip title="Remove from Cart">
+              <Box onClick={() => removeItemFromCart(item.product.id)}>
+                <CloseIcon />
+              </Box>
             </Tooltip>
           </Box>
         </Grid>
@@ -80,18 +91,18 @@ export const OrderSummary = () => {
   const calculatePrice = (type: string) => {
     let price = 0;
     switch (type) {
-      case "subtotal":
+      case "Subtotal":
         itemsInCart.forEach((item) => {
           price = price + item.product.price * item.quantity;
         });
         break;
-      case "taxes":
+      case "Taxes":
         itemsInCart.forEach((item) => {
           price = price + item.product.price * item.quantity;
         });
         price = price * 0.04;
         break;
-      case "total":
+      case "Total":
         itemsInCart.forEach((item) => {
           price = price + item.product.price * item.quantity;
         });
@@ -102,6 +113,36 @@ export const OrderSummary = () => {
 
     return price.toFixed(2);
   };
+
+  const removeItemFromCart = (productId: number) => {
+    const deleteIndex = itemsInCart.findIndex(
+      (i) => i.product.id === productId
+    );
+    itemsInCart.splice(deleteIndex, 1);
+    updateItemsInCart([...itemsInCart]);
+    updateCheckoutItems(checkoutItems - 1);
+  };
+
+  const showPrice = priceTypes.map((type) => (
+    <>
+      <Box
+        key={type}
+        sx={{
+          padding: "10px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography sx={{ fontWeight: type === "Total" ? "bold" : "normal" }}>
+          {type}:
+        </Typography>
+        <Typography sx={{ fontWeight: type === "Total" ? "bold" : "normal" }}>
+          ${calculatePrice(type)}
+        </Typography>
+      </Box>
+      <Divider />
+    </>
+  ));
 
   return (
     <Card>
@@ -118,42 +159,7 @@ export const OrderSummary = () => {
           }}
         >
           <InvisibleScrollbarBox>{orderSummary}</InvisibleScrollbarBox>
-          <Box>
-            <Box
-              sx={{
-                padding: "10px",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography>Subtotal:</Typography>
-              <Typography>${calculatePrice("subtotal")}</Typography>
-            </Box>
-            <Divider />
-            <Box
-              sx={{
-                padding: "10px",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography>Taxes:</Typography>
-              <Typography>${calculatePrice("taxes")}</Typography>
-            </Box>
-            <Divider />
-            <Box
-              sx={{
-                padding: "10px",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography sx={{ fontWeight: "bold" }}>Total:</Typography>
-              <Typography sx={{ fontWeight: "bold" }}>
-                ${calculatePrice("total")}
-              </Typography>
-            </Box>
-          </Box>
+          <Box>{showPrice}</Box>
         </Container>
       </CardContent>
     </Card>

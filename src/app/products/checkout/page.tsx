@@ -15,6 +15,9 @@ import {
 } from "@mui/material";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import Link from "next/link";
+import { ShippingInformation } from "@/components/shippingInformation";
+import { ScheduleDelivery } from "@/components/scheduleDelivery";
+import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 
 export default function Checkout() {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
@@ -43,21 +46,38 @@ export default function Checkout() {
         <Box sx={{ padding: "20px" }}>
           <Grid container>
             <Grid item xs={6}>
-              <Card>
-                <CardContent>
-                  <Container>
-                    <Box>
-                      <Typography>Shipping Information</Typography>
-                    </Box>
-                    <Box>
-                      <Typography>Delivery Details</Typography>
-                    </Box>
-                    <Box>
-                      <Typography>Add Payment Method</Typography>
-                    </Box>
-                  </Container>
-                </CardContent>
-              </Card>
+              <Box sx={{ paddingBottom: "20px" }}>
+                <Card>
+                  <CardContent>
+                    <Container>
+                      <ShippingInformation />
+                    </Container>
+                  </CardContent>
+                </Card>
+              </Box>
+              <Box sx={{ paddingBottom: "20px" }}>
+                <Card>
+                  <CardContent>
+                    <Container>
+                      <ScheduleDelivery />
+                    </Container>
+                  </CardContent>
+                </Card>
+              </Box>
+              <Box
+                sx={{
+                  marginTop: "50px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <ActionButton
+                  variant="contained"
+                  label="Move to Payment Screen"
+                  color="primary"
+                  disabled={true}
+                />
+              </Box>
             </Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={5}>
