@@ -18,9 +18,13 @@ import Link from "next/link";
 import { ShippingInformation } from "@/components/shippingInformation";
 import { ScheduleDelivery } from "@/components/scheduleDelivery";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
+import { useForm, FormProvider, useFormContext } from "react-hook-form";
 
 export default function Checkout() {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
+  const methods = useForm();
+
+  const onSubmit = (data: any) => console.log(data);
 
   return (
     <div>
@@ -46,39 +50,49 @@ export default function Checkout() {
         <Box sx={{ padding: "20px" }}>
           <Grid container>
             <Grid item xs={6}>
-              <Box sx={{ paddingBottom: "20px" }}>
-                <Card>
-                  <CardContent>
-                    <Container>
-                      <ShippingInformation />
-                    </Container>
-                  </CardContent>
-                </Card>
-              </Box>
-              <Box sx={{ paddingBottom: "20px" }}>
-                <Card>
-                  <CardContent>
-                    <Container>
-                      <ScheduleDelivery />
-                    </Container>
-                  </CardContent>
-                </Card>
-              </Box>
-              <Box
-                sx={{
-                  marginTop: "50px",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <ActionButton
-                  variant="contained"
-                  label="Move to Payment Screen"
-                  color="primary"
-                  disabled={true}
-                />
-              </Box>
+              <FormProvider {...methods}>
+                <form
+                  onSubmit={methods.handleSubmit(onSubmit)}
+                  noValidate
+                  style={{ width: "100%" }}
+                >
+                  <Box sx={{ paddingBottom: "20px" }}>
+                    <Card>
+                      <CardContent>
+                        <Container>
+                          <ShippingInformation />
+                        </Container>
+                      </CardContent>
+                    </Card>
+                  </Box>
+                  <Box sx={{ paddingBottom: "20px" }}>
+                    <Card>
+                      <CardContent>
+                        <Container>
+                          <ScheduleDelivery />
+                        </Container>
+                      </CardContent>
+                    </Card>
+                  </Box>
+                  <Box
+                    sx={{
+                      marginTop: "50px",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ActionButton
+                      variant="contained"
+                      label="Move to Payment Screen"
+                      color="primary"
+                      type="submit"
+                      // disabled={true}
+                    />
+                  </Box>
+                </form>
+              </FormProvider>
             </Grid>
+
             <Grid item xs={1}></Grid>
             <Grid item xs={5}>
               <OrderSummary />

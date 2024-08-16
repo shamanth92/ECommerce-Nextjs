@@ -1,5 +1,5 @@
 import { Box, TextField, Typography } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useFormContext } from "react-hook-form";
 
 export const ShippingInformation = () => {
   type ShippingInputs = {
@@ -19,7 +19,7 @@ export const ShippingInformation = () => {
     clearErrors,
     reset,
     formState: { errors },
-  } = useForm<ShippingInputs>();
+  } = useFormContext<ShippingInputs>();
   return (
     <Box>
       <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
