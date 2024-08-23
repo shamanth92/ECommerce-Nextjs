@@ -10,12 +10,15 @@ import {
   MenuItem,
   Rating,
   Select,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { Products } from "./allProducts";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useState } from "react";
 import { useAppStore } from "@/zustand/store";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 interface ProductProps {
   productDetails: Products;
@@ -23,10 +26,18 @@ interface ProductProps {
 
 export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const [quantity, setQuantity] = useState(1);
+  const [addToFavorites, setAddToFavorites] = useState(false);
   const checkoutItems = useAppStore((state) => state.checkoutItems);
   const itemsInCart = useAppStore((state) => state.itemsInCart);
+  const favorites = useAppStore((state) => state.favorites);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
+  const updateFavorites = useAppStore((state) => state.updateFavorites);
+
+  const addItemToFavorites = () => {
+    setAddToFavorites(!addToFavorites);
+    updateFavorites([...favorites, productDetails]);
+  };
 
   const updateCheckoutIcon = () => {
     updateCheckoutItems(
@@ -111,13 +122,22 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
                   buttonClick={() => setQuantity(quantity + 1)}
                 />
               </Box>
-              <Box>
+              <Box sx={{ display: "flex" }}>
                 <ActionButton
                   variant="contained"
                   label="Add to Cart"
                   color="primary"
                   buttonClick={() => updateCheckoutIcon()}
                 />
+                <Tooltip title="Add To Favorites">
+                  <Box
+                    onClick={() => addItemToFavorites()}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    {!addToFavorites && <FavoriteBorderIcon />}
+                    {addToFavorites && <FavoriteIcon />}
+                  </Box>
+                </Tooltip>
               </Box>
             </Box>
           </Box>

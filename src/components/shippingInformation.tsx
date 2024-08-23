@@ -1,5 +1,5 @@
 import { Box, TextField, Typography } from "@mui/material";
-import { Controller, useForm, useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 export const ShippingInformation = () => {
   type ShippingInputs = {

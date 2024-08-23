@@ -18,13 +18,22 @@ import Link from "next/link";
 import { ShippingInformation } from "@/components/shippingInformation";
 import { ScheduleDelivery } from "@/components/scheduleDelivery";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
-import { useForm, FormProvider, useFormContext } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 export default function Checkout() {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
-  const methods = useForm();
+  const methods = useForm({
+    defaultValues: {
+      deliveryType: "standard",
+    },
+  });
+  const router = useRouter();
 
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = (data: any) => {
+    console.log(data);
+    router.push("/products/payment");
+  };
 
   return (
     <div>
