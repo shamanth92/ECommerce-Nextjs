@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { Products } from "./allProducts";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -34,9 +34,24 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const updateFavorites = useAppStore((state) => state.updateFavorites);
 
+  useEffect(() => {
+    const isFavorite =
+      favorites.filter((f: any) => f.id === productDetails.id).length > 0;
+    setAddToFavorites(isFavorite);
+  }, [favorites, productDetails.id]);
+
   const addItemToFavorites = () => {
-    setAddToFavorites(!addToFavorites);
-    updateFavorites([...favorites, productDetails]);
+    const isFavorite =
+      favorites.filter((f: any) => f.id === productDetails.id).length > 0;
+    setAddToFavorites(!isFavorite);
+    const removeFavorite = favorites.filter(
+      (f: any) => f.id !== productDetails.id
+    );
+    if (!isFavorite) {
+      updateFavorites([...favorites, productDetails]);
+    } else {
+      updateFavorites(removeFavorite);
+    }
   };
 
   const updateCheckoutIcon = () => {
@@ -122,20 +137,26 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
                   buttonClick={() => setQuantity(quantity + 1)}
                 />
               </Box>
-              <Box sx={{ display: "flex" }}>
+              <Box>
                 <ActionButton
                   variant="contained"
                   label="Add to Cart"
                   color="primary"
                   buttonClick={() => updateCheckoutIcon()}
                 />
+              </Box>
+              <Box>
                 <Tooltip title="Add To Favorites">
                   <Box
                     onClick={() => addItemToFavorites()}
                     sx={{ cursor: "pointer" }}
                   >
-                    {!addToFavorites && <FavoriteBorderIcon />}
-                    {addToFavorites && <FavoriteIcon />}
+                    {!addToFavorites && (
+                      <FavoriteBorderIcon sx={{ fontSize: "30px" }} />
+                    )}
+                    {addToFavorites && (
+                      <FavoriteIcon sx={{ fontSize: "30px" }} />
+                    )}
                   </Box>
                 </Tooltip>
               </Box>
