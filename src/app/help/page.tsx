@@ -1,3 +1,4 @@
+"use client";
 import { AppHeader } from "@/ui-components/AppHeader/AppHeader";
 import {
   Accordion,
@@ -9,8 +10,11 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import styles from "./help.module.css";
+import { HelpChatBot } from "@/components/HelpChatBot/helpChatBot";
+import { useState } from "react";
 
 export default function Help() {
+  const [openChat, setOpenChat] = useState(false);
   return (
     <div>
       <AppHeader />
@@ -188,10 +192,16 @@ export default function Help() {
               variant="contained"
               label="Chat with a Virtual Agent"
               color="primary"
+              buttonClick={() => setOpenChat(!openChat)}
             ></ActionButton>
           </Box>
         </Box>
       </Box>
+      {openChat && (
+        <Box sx={{ position: "absolute", right: "50px", top: "325px" }}>
+          <HelpChatBot />
+        </Box>
+      )}
       <Box
         component="footer"
         sx={{
