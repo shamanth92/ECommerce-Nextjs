@@ -35,22 +35,69 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const updateFavorites = useAppStore((state) => state.updateFavorites);
 
   useEffect(() => {
-    const isFavorite =
-      favorites.filter((f: any) => f.id === productDetails.id).length > 0;
-    setAddToFavorites(isFavorite);
+    const getFavorites = async () => {
+      const response = await fetch(
+        "/ecommerce/addToWishlist?email=rafa@abc.com"
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        const isFavorite =
+          data.filter((f: any) => f.id === productDetails.id).length > 0;
+        //   setFavorites(data);
+        setAddToFavorites(isFavorite);
+      }
+    };
+    getFavorites();
   }, [favorites, productDetails.id]);
 
-  const addItemToFavorites = () => {
-    const isFavorite =
-      favorites.filter((f: any) => f.id === productDetails.id).length > 0;
-    setAddToFavorites(!isFavorite);
-    const removeFavorite = favorites.filter(
-      (f: any) => f.id !== productDetails.id
-    );
-    if (!isFavorite) {
-      updateFavorites([...favorites, productDetails]);
+  const addItemToFavorites = async () => {
+    // const isFavorite =
+    //   favorites.filter((f: any) => f.id === productDetails.id).length > 0;
+    // const removeFavorite = favorites.filter(
+    //   (f: any) => f.id !== productDetails.id
+    // );
+    // console.log("isFavorite", isFavorite);
+    if (!addToFavorites) {
+      try {
+        productDetails = { ...productDetails, email: "rafa@abc.com" };
+        const res = await fetch("/ecommerce/addToWishlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(productDetails),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to call API: ${res.statusText}`);
+        }
+        setAddToFavorites(!addToFavorites);
+      } catch (error) {
+        console.error("Error calling API:", error);
+      }
+      //   updateFavorites([...favorites, productDetails]);
     } else {
-      updateFavorites(removeFavorite);
+      try {
+        productDetails = { ...productDetails, email: "rafa@abc.com" };
+        const res = await fetch(
+          `/ecommerce/addToWishlist?email=rafa@abc.com&id=${productDetails.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Failed to call API: ${res.statusText}`);
+        }
+        setAddToFavorites(!addToFavorites);
+      } catch (error) {
+        console.error("Error calling API:", error);
+      }
+      //   updateFavorites(removeFavorite);
     }
   };
 

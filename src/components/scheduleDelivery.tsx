@@ -1,3 +1,4 @@
+import { useAppStore } from "@/zustand/store";
 import {
   Box,
   FormControl,
@@ -6,8 +7,11 @@ import {
   Radio,
   RadioGroup,
   Typography,
+  Tooltip,
 } from "@mui/material";
+import { useState, useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import EditIcon from "@mui/icons-material/Edit";
 
 export const ScheduleDelivery = () => {
   type ScheduleInputs = {
@@ -23,11 +27,27 @@ export const ScheduleDelivery = () => {
     formState: { errors },
   } = useFormContext<ScheduleInputs>();
 
+  const editMode = useAppStore((state) => state.editMode);
+  const [showEdit, setShowEdit] = useState(false);
+
+  useEffect(() => {
+    setShowEdit(editMode);
+  }, [editMode]);
+
   return (
     <Box>
-      <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
-        Schedule Delivery
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography sx={{ fontWeight: "bold", fontSize: "20px" }}>
+          Schedule Delivery
+        </Typography>
+        {editMode && (
+          <Tooltip title="Edit shipping information">
+            <Box onClick={() => setShowEdit(false)}>
+              <EditIcon sx={{ cursor: "pointer" }} />
+            </Box>
+          </Tooltip>
+        )}
+      </Box>
       <Box>
         <FormControl>
           <Controller
@@ -38,6 +58,7 @@ export const ScheduleDelivery = () => {
               <RadioGroup {...field} defaultValue="standard">
                 <FormControlLabel
                   value="standard"
+                  disabled={showEdit}
                   control={<Radio />}
                   label={
                     <Typography>
@@ -48,6 +69,7 @@ export const ScheduleDelivery = () => {
                 />
                 <FormControlLabel
                   value="express"
+                  disabled={showEdit}
                   control={<Radio />}
                   label={
                     <Typography>
@@ -57,6 +79,7 @@ export const ScheduleDelivery = () => {
                 />
                 <FormControlLabel
                   value="priority"
+                  disabled={showEdit}
                   control={<Radio />}
                   label={
                     <Typography>

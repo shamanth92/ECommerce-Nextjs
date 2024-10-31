@@ -1,7 +1,7 @@
 "use client";
 import { OrderSummary } from "@/components/orderSummary";
 import { AppHeader } from "@/ui-components/AppHeader/AppHeader";
-import { useAppStore } from "@/zustand/store";
+import { CurrentOrder, ORDERSTATUS, useAppStore } from "@/zustand/store";
 import {
   Box,
   Card,
@@ -20,9 +20,19 @@ import { ScheduleDelivery } from "@/components/scheduleDelivery";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useEffect } from "react";
+import { PaymentScreen } from "@/components/paymentScreen";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
 
 export default function Checkout() {
+  const [paymentScreen, setPaymentScreen] = useState(false);
+  const [confirmScreen, setConfirmScreen] = useState(false);
+  const [currentOrderNumber, setOrderNumber] = useState("");
+  const currentOrder = useAppStore((state) => state.currentOrder);
   const itemsInCart = useAppStore((state) => state.itemsInCart);
+  const editMode = useAppStore((state) => state.editMode);
+  const setCurrentOrder = useAppStore((state) => state.setCurrentOrder);
   const methods = useForm({
     defaultValues: {
       deliveryType: "standard",
@@ -30,15 +40,165 @@ export default function Checkout() {
   });
   const router = useRouter();
 
+  const fromPayment = () => {
+    setPaymentScreen(false);
+  };
+
+  const addAccountAddress = async () => {
+    // const hasErrors = Object.keys(methods.formState);
+    console.log("hasErrors: ", methods.getValues());
+    const values: any = methods.getValues();
+    const addressRequest = {
+      email: "rafa@abc.com",
+      fullName: values.name,
+      addressLineOne: values.address,
+      city: values.city,
+      state: values.state,
+      zipCode: values.zipCode,
+      phoneNumber: values.phoneNumber,
+      setAsDefault: true,
+    };
+    try {
+      const res = await fetch("/ecommerce/account/saveAddress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(addressRequest),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to call API: ${res.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+    }
+  };
+
   const onSubmit = (data: any) => {
     console.log(data);
-    router.push("/products/payment");
+    // router.push("/products/payment");
+    if (!editMode) {
+      setPaymentScreen(true);
+    } else {
+      const random = Math.floor(10000 + Math.random() * 90000);
+      const orderNumber = `ECOMM${random}`;
+      setOrderNumber(orderNumber);
+      const date = Date.now();
+      console.log(itemsInCart);
+      const itemsOrdered: CurrentOrder = {
+        orderNumber: orderNumber,
+        dateOrdered: date.toString(),
+        status: ORDERSTATUS.Ordered,
+        product: itemsInCart,
+        shippingInfo: data,
+      };
+      setConfirmScreen(true);
+      setCurrentOrder([...currentOrder, itemsOrdered]);
+    }
   };
 
   return (
-    <div>
-      <AppHeader />
-      {itemsInCart.length == 0 && (
+    <>
+      {!confirmScreen && (
+        <div>
+          <AppHeader />
+          {itemsInCart.length == 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                height: "80vh",
+              }}
+            >
+              <RemoveShoppingCartIcon sx={{ fontSize: "100px" }} />
+              <h1>Your cart is empty.</h1>
+              <Typography>
+                Click <Link href="/products">here</Link> to continue shopping.
+              </Typography>
+            </Box>
+          )}
+          {itemsInCart.length > 0 && (
+            <Box sx={{ padding: "20px" }}>
+              <Grid container>
+                <Grid item xs={6}>
+                  <FormProvider {...methods}>
+                    <form
+                      onSubmit={methods.handleSubmit(onSubmit)}
+                      noValidate
+                      style={{ width: "100%" }}
+                    >
+                      {!paymentScreen && (
+                        <Box sx={{ paddingBottom: "20px" }}>
+                          <Card>
+                            <CardContent>
+                              <Container>
+                                <ShippingInformation />
+                              </Container>
+                            </CardContent>
+                          </Card>
+                        </Box>
+                      )}
+                      {!paymentScreen && (
+                        <Box sx={{ paddingBottom: "20px" }}>
+                          <Card>
+                            <CardContent>
+                              <Container>
+                                <ScheduleDelivery />
+                              </Container>
+                            </CardContent>
+                          </Card>
+                        </Box>
+                      )}
+                      {!paymentScreen && (
+                        <Box
+                          sx={{
+                            marginTop: "50px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            width: "40%",
+                            float: "right",
+                          }}
+                        >
+                          <ActionButton
+                            variant="contained"
+                            label={
+                              editMode
+                                ? "Submit Order"
+                                : "Move to Payment Screen"
+                            }
+                            color="primary"
+                            type="submit"
+                            // buttonClick={() => setPaymentScreen(true)}
+                            // disabled={true}
+                          />
+                          <ActionButton
+                            variant="contained"
+                            label="Save Address"
+                            color="primary"
+                            buttonClick={() => addAccountAddress()}
+                          />
+                        </Box>
+                      )}
+                    </form>
+                  </FormProvider>
+                  {paymentScreen && !editMode && (
+                    <PaymentScreen onClick={() => fromPayment()} />
+                  )}
+                </Grid>
+
+                <Grid item xs={1}></Grid>
+                <Grid item xs={5}>
+                  <OrderSummary />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </div>
+      )}
+      {confirmScreen && (
         <Box
           sx={{
             display: "flex",
@@ -48,67 +208,17 @@ export default function Checkout() {
             height: "80vh",
           }}
         >
-          <RemoveShoppingCartIcon sx={{ fontSize: "100px" }} />
-          <h1>Your cart is empty.</h1>
+          <TaskAltIcon sx={{ fontSize: "100px" }} />
+          <h1>Thank you for your order!</h1>
+          <h3>
+            A confirmation has been sent to your email for Order #{" "}
+            {currentOrderNumber}
+          </h3>
           <Typography>
-            Click <Link href="/products">here</Link> to continue shopping.
+            Click <Link href="/orders">here</Link> to view your order details.
           </Typography>
         </Box>
       )}
-      {itemsInCart.length > 0 && (
-        <Box sx={{ padding: "20px" }}>
-          <Grid container>
-            <Grid item xs={6}>
-              <FormProvider {...methods}>
-                <form
-                  onSubmit={methods.handleSubmit(onSubmit)}
-                  noValidate
-                  style={{ width: "100%" }}
-                >
-                  <Box sx={{ paddingBottom: "20px" }}>
-                    <Card>
-                      <CardContent>
-                        <Container>
-                          <ShippingInformation />
-                        </Container>
-                      </CardContent>
-                    </Card>
-                  </Box>
-                  <Box sx={{ paddingBottom: "20px" }}>
-                    <Card>
-                      <CardContent>
-                        <Container>
-                          <ScheduleDelivery />
-                        </Container>
-                      </CardContent>
-                    </Card>
-                  </Box>
-                  <Box
-                    sx={{
-                      marginTop: "50px",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <ActionButton
-                      variant="contained"
-                      label="Move to Payment Screen"
-                      color="primary"
-                      type="submit"
-                      // disabled={true}
-                    />
-                  </Box>
-                </form>
-              </FormProvider>
-            </Grid>
-
-            <Grid item xs={1}></Grid>
-            <Grid item xs={5}>
-              <OrderSummary />
-            </Grid>
-          </Grid>
-        </Box>
-      )}
-    </div>
+    </>
   );
 }

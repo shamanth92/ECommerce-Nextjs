@@ -25,9 +25,10 @@ export interface Products {
   category: string;
   image: string;
   rating: { rate: number; count: number };
+  email?: string;
 }
 
-export const AllProducts: React.FC<ProductsProps> = ({ products }) => {
+export const AllProducts: React.FC<any> = ({ products }) => {
   const productSelect = useAppStore((state) => state.productSelect);
   const updateProductSelect = useAppStore((state) => state.updateProductSelect);
   const router = useRouter();

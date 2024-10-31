@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^4.4.0",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.4",
+    "luxon": "^3.5.0",
     "next": "^14.2.5",
     "react": "^18",
     "react-chatbot-kit": "^2.2.2",
@@ -28,6 +29,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/luxon": "^3.4.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

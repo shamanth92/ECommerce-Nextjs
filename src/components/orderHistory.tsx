@@ -19,163 +19,115 @@ import {
 import styles from "./../componentStyles/orderHistory.module.css";
 import { useState } from "react";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
+import { ItemsInCart, ShippingInfo, useAppStore } from "@/zustand/store";
+import { DateTime } from "luxon";
 
 export default function OrderHistory() {
   const [openOrder, setOpenOrder] = useState(false);
+  const currentOrder = useAppStore((state) => state.currentOrder);
+
+  console.log(currentOrder);
+  const calculateTotal = (products: Array<ItemsInCart>) => {
+    let price = 0;
+    products.forEach((item) => {
+      price = price + item.product.price * item.quantity;
+    });
+    price = price + price * 0.04;
+    return price.toFixed(2);
+  };
+
+  const getEstimatedDate = (
+    shippingInfo: ShippingInfo,
+    dateOrdered: string
+  ) => {
+    let estDate = "";
+    const dateNow = DateTime.fromMillis(parseInt(dateOrdered)).toFormat(
+      "dd-MMMM-yyyy"
+    );
+    const dateConvert = DateTime.fromFormat(dateNow, "dd-MMMM-yyyy");
+    switch (shippingInfo.deliveryType) {
+      case "standard":
+        estDate = dateConvert.plus({ days: 10 }).toFormat("dd-MMMM-yyyy");
+        break;
+      case "express":
+        estDate = dateConvert.plus({ days: 5 }).toFormat("dd-MMMM-yyyy");
+        break;
+      case "priority":
+        estDate = dateConvert.plus({ days: 2 }).toFormat("dd-MMMM-yyyy");
+      default:
+        break;
+    }
+    return estDate;
+  };
+
   return (
     <div className={styles.orderHistory}>
       <Stack spacing={3} sx={{ width: "80%" }}>
-        <Card>
-          <CardContent>
-            <div className={styles.orderDetailsContainer}>
-              <div className={styles.orderDetails}>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Order #
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    ABCD12345678
-                  </Typography>
+        {currentOrder.map((order) => (
+          <Card key={order.orderNumber}>
+            <CardContent>
+              <div className={styles.orderDetailsContainer}>
+                <div className={styles.orderDetails}>
+                  <div>
+                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                      Order #
+                    </Typography>
+                    <Typography sx={{ fontSize: "14px" }}>
+                      {order.orderNumber}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                      Date Ordered
+                    </Typography>
+                    <Typography sx={{ fontSize: "14px" }}>
+                      {DateTime.fromMillis(
+                        parseInt(order.dateOrdered)
+                      ).toFormat("dd-MMMM-yyyy")}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                      Total Amount
+                    </Typography>
+                    <Typography sx={{ fontSize: "14px" }}>
+                      ${calculateTotal(order.product)}
+                    </Typography>
+                  </div>
+                  <div>
+                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                      {order.status}
+                    </Typography>
+                    <Typography sx={{ fontSize: "14px" }}>
+                      {order.status === "ORDERED"
+                        ? `Estimated On: ${getEstimatedDate(
+                            order.shippingInfo,
+                            order.dateOrdered
+                          )}`
+                        : getEstimatedDate(
+                            order.shippingInfo,
+                            order.dateOrdered
+                          )}
+                    </Typography>
+                  </div>
                 </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Date Ordered
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    June 15, 2024
-                  </Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Total Amount
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>$83.59</Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Delivered On
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    June 18, 2024
-                  </Typography>
-                </div>
-              </div>
-              <div className={styles.actionButtons}>
-                <ActionButton
-                  variant="contained"
-                  label="View Order"
-                  color="primary"
-                  buttonClick={() => setOpenOrder(true)}
-                />
-                <ActionButton
-                  variant="contained"
-                  label="View Invoice"
-                  color="primary"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <div className={styles.orderDetailsContainer}>
-              <div className={styles.orderDetails}>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Order #
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    ABCD12345678
-                  </Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Date Ordered
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    June 15, 2024
-                  </Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Total Amount
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>$83.59</Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Delivered On
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    June 18, 2024
-                  </Typography>
+                <div className={styles.actionButtons}>
+                  <ActionButton
+                    variant="contained"
+                    label="View Order"
+                    color="primary"
+                    buttonClick={() => setOpenOrder(true)}
+                  />
+                  <ActionButton
+                    variant="contained"
+                    label="View Invoice"
+                    color="primary"
+                  />
                 </div>
               </div>
-              <div className={styles.actionButtons}>
-                <ActionButton
-                  variant="contained"
-                  label="View Order"
-                  color="primary"
-                />
-                <ActionButton
-                  variant="contained"
-                  label="View Invoice"
-                  color="primary"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <div className={styles.orderDetailsContainer}>
-              <div className={styles.orderDetails}>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Order #
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    ABCD12345678
-                  </Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Date Ordered
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    June 15, 2024
-                  </Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Total Amount
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>$83.59</Typography>
-                </div>
-                <div>
-                  <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                    Delivered On
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    June 18, 2024
-                  </Typography>
-                </div>
-              </div>
-              <div className={styles.actionButtons}>
-                <ActionButton
-                  variant="contained"
-                  label="View Order"
-                  color="primary"
-                />
-                <ActionButton
-                  variant="contained"
-                  label="View Invoice"
-                  color="primary"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </Stack>
       <Dialog
         open={openOrder}
@@ -192,9 +144,9 @@ export default function OrderHistory() {
         //   },
         // }}
       >
-        <DialogTitle>Order# ABCD12345678 - Out for Delivery</DialogTitle>
+        <DialogTitle>Order# ABCD12345678 - Arriving by </DialogTitle>
         <DialogContent>
-          <Stepper activeStep={2} alternativeLabel>
+          <Stepper activeStep={0} alternativeLabel>
             <Step>
               <StepLabel>Order Placed</StepLabel>
             </Step>
@@ -208,77 +160,55 @@ export default function OrderHistory() {
               <StepLabel>Delivered (Tracking # 12345678)</StepLabel>
             </Step>
           </Stepper>
-          <Box sx={{ marginTop: "10px" }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "95%;",
-              }}
-            >
-              <Box>
-                <CardMedia
-                  component="img"
-                  alt="Order"
-                  image="https://images.unsplash.com/photo-1545289414-1c3cb1c06238?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  sx={{ maxWidth: "200px", height: "200px" }}
-                ></CardMedia>
-              </Box>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Stack spacing={1}>
-                  <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                    PUMA Caven 2.0 Lux SD Sneakers
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>Size: 9</Typography>
-                  <Typography sx={{ fontSize: "14px" }}>Color: Navy</Typography>
-                  <Typography sx={{ fontSize: "14px" }}>Quantity: 1</Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    Price: $89.53
-                  </Typography>
-                </Stack>
-              </Box>
-            </Box>
+          {/* This logic is wrong */}
+          <Box sx={{ marginTop: "10px" }}>
+            {currentOrder.map((orders) =>
+              orders.product.map((item) => (
+                <Box
+                  key={item.product.id}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "95%;",
+                  }}
+                >
+                  <Box>
+                    <CardMedia
+                      component="img"
+                      alt="Order"
+                      image={item.product.image}
+                      sx={{ maxWidth: "200px", height: "200px" }}
+                    ></CardMedia>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Stack spacing={1}>
+                      <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
+                        {item.product.title}
+                      </Typography>
+                      {/* <Typography sx={{ fontSize: "14px" }}>Size: 9</Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        Color: Navy
+                      </Typography> */}
+                      <Typography sx={{ fontSize: "14px" }}>
+                        Quantity: {item.quantity}
+                      </Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        Price: ${item.product.price}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Box>
+              ))
+            )}
             <Divider />
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "95%;",
-              }}
-            >
-              <CardMedia
-                component="img"
-                alt="Order"
-                image="https://images.unsplash.com/photo-1545289414-1c3cb1c06238?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                sx={{ maxWidth: "200px", height: "200px" }}
-              ></CardMedia>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Stack spacing={1}>
-                  <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                    PUMA Caven 2.0 Lux SD Sneakers
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px" }}>Size: 9</Typography>
-                  <Typography sx={{ fontSize: "14px" }}>Color: Navy</Typography>
-                  <Typography sx={{ fontSize: "14px" }}>Quantity: 1</Typography>
-                  <Typography sx={{ fontSize: "14px" }}>
-                    Price: $89.53
-                  </Typography>
-                </Stack>
-              </Box>
-            </Box>
           </Box>
           <Box
             sx={{
