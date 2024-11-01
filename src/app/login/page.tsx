@@ -8,6 +8,7 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useAppStore } from "@/zustand/store";
+import { setCookie } from "cookies-next";
 
 export default function Login() {
   const [loginError, setLoginError] = useState(false);
@@ -37,10 +38,14 @@ export default function Login() {
     const auth = getAuth();
     // setTimeout(() => {
     signInWithEmailAndPassword(auth, data.username, data.password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         setLoginError(false);
         const user = userCredential.user;
-        console.log(user);
+        console.log(await user.getIdToken());
+        setCookie("token", user.email, {
+          maxAge: 3600,
+          path: "/",
+        });
         setUserInfo({
           emailAddress: user.email,
           fullName: user.displayName,

@@ -21,10 +21,14 @@ import { useAppStore } from "@/zustand/store";
 import { PersonAdd, Settings, Logout } from "@mui/icons-material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { app } from "@/firebase/initialize";
+import { getAuth, signOut } from "firebase/auth";
+import { deleteCookie } from "cookies-next";
 
 export const AppHeader = () => {
   const checkoutItems = useAppStore((state) => state.checkoutItems);
   const userInfo = useAppStore((state) => state.userInfo);
+  const resetState = useAppStore((state) => state.resetState);
   const [anchorEl, setAnchorEl] = useState(null);
   const router = useRouter();
   const open = Boolean(anchorEl);
@@ -41,6 +45,19 @@ export const AppHeader = () => {
         break;
       case "Help":
         router.push("/help");
+        break;
+      case "Logout":
+        const auth = getAuth(app);
+        signOut(auth)
+          .then((res) => {
+            console.log(res);
+            deleteCookie("token");
+            resetState();
+            router.push("/login");
+          })
+          .catch((error) => {
+            // An error happened.
+          });
         break;
 
       default:
@@ -104,8 +121,12 @@ export const AppHeader = () => {
             </Box>
             <IconButton onClick={handleClick}>
               <Avatar>
-                {userInfo.fullName.split(" ")[0][0]}
-                {userInfo.fullName.split(" ")[1][0]}
+                {userInfo?.fullName !== ""
+                  ? userInfo.fullName.split(" ")[0][0]
+                  : ""}
+                {userInfo?.fullName !== ""
+                  ? userInfo.fullName.split(" ")[1][0]
+                  : ""}
               </Avatar>
             </IconButton>
           </Box>

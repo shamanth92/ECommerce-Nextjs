@@ -17,6 +17,7 @@
     "@mui/material-nextjs": "^5.15.11",
     "@stripe/react-stripe-js": "^2.8.0",
     "@stripe/stripe-js": "^4.4.0",
+    "cookies-next": "^4.3.0",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.4",
     "luxon": "^3.5.0",

@@ -57,10 +57,10 @@ type Action = {
   setEditMode: (editMode: State["editMode"]) => void;
   setCurrentOrder: (currentOrder: State["currentOrder"]) => void;
   setUserInfo: (userInfo: State["userInfo"]) => void;
+  resetState: () => void;
 };
 
-// Create your store, which includes both state and (optionally) actions
-export const useAppStore = create<State & Action>((set) => ({
+const initialState: State = {
   productSelect: {},
   checkoutItems: 0,
   itemsInCart: [],
@@ -71,6 +71,11 @@ export const useAppStore = create<State & Action>((set) => ({
     fullName: '',
     accountCreated: '',
     lastLoggedIn: ''},
+}
+
+// Create your store, which includes both state and (optionally) actions
+export const useAppStore = create<State & Action>((set) => ({
+  ...initialState,
   updateProductSelect: (productSelect) =>
     set(() => ({ productSelect: productSelect })),
   updateCheckoutItems: (checkoutItems) =>
@@ -81,4 +86,5 @@ export const useAppStore = create<State & Action>((set) => ({
   setCurrentOrder: (currentOrder: Array<CurrentOrder>) =>
     set(() => ({ currentOrder: currentOrder })),
   setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),
+  resetState: () => { set(initialState) }
 }));
