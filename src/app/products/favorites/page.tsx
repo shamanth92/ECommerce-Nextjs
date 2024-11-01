@@ -5,13 +5,13 @@ import { useAppStore } from "@/zustand/store";
 import { useEffect, useState } from "react";
 
 export default function Favorites() {
-  // const favorites = useAppStore((state) => state.favorites);
+  const userInfo = useAppStore((state) => state.userInfo);
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     const getFavorites = async () => {
       const response = await fetch(
-        "/ecommerce/addToWishlist?email=rafa@abc.com"
+        `/ecommerce/addToWishlist?email=${userInfo.emailAddress}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -19,7 +19,7 @@ export default function Favorites() {
       }
     };
     getFavorites();
-  }, []);
+  }, [userInfo.emailAddress]);
 
   return (
     <div>

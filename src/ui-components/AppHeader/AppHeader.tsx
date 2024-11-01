@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 
 export const AppHeader = () => {
   const checkoutItems = useAppStore((state) => state.checkoutItems);
+  const userInfo = useAppStore((state) => state.userInfo);
   const [anchorEl, setAnchorEl] = useState(null);
   const router = useRouter();
   const open = Boolean(anchorEl);
@@ -102,7 +103,10 @@ export const AppHeader = () => {
               </Link>
             </Box>
             <IconButton onClick={handleClick}>
-              <Avatar>SP</Avatar>
+              <Avatar>
+                {userInfo.fullName.split(" ")[0][0]}
+                {userInfo.fullName.split(" ")[1][0]}
+              </Avatar>
             </IconButton>
           </Box>
         </Box>

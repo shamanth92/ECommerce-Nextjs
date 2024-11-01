@@ -32,6 +32,7 @@ export default function Checkout() {
   const currentOrder = useAppStore((state) => state.currentOrder);
   const itemsInCart = useAppStore((state) => state.itemsInCart);
   const editMode = useAppStore((state) => state.editMode);
+  const userInfo = useAppStore((state) => state.userInfo);
   const setCurrentOrder = useAppStore((state) => state.setCurrentOrder);
   const methods = useForm({
     defaultValues: {
@@ -49,7 +50,7 @@ export default function Checkout() {
     console.log("hasErrors: ", methods.getValues());
     const values: any = methods.getValues();
     const addressRequest = {
-      email: "rafa@abc.com",
+      email: userInfo.emailAddress,
       fullName: values.name,
       addressLineOne: values.address,
       city: values.city,

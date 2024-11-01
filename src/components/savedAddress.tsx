@@ -15,15 +15,17 @@ import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { AccountActions } from "@/ui-components/AccountActions/AccountActions";
 import HomeIcon from "@mui/icons-material/Home";
 import { useEffect, useState } from "react";
+import { useAppStore } from "@/zustand/store";
 
 export default function SavedAddress() {
   const [address, setAddress] = useState([]);
+  const userInfo = useAppStore((state) => state.userInfo);
   const addAccountAddress = () => {};
 
   useEffect(() => {
     const getAddresses = async () => {
       const response = await fetch(
-        "/ecommerce/account/saveAddress?email=rafa@abc.com"
+        `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`
       );
       if (response.ok) {
         const data = await response.json();

@@ -32,6 +32,13 @@ export interface CurrentOrder {
   shippingInfo: ShippingInfo;
 }
 
+export interface UserInfo {
+  emailAddress: string | null;
+  fullName: string | null;
+  accountCreated: string;
+  lastLoggedIn: string;
+}
+
 type State = {
   productSelect: any;
   checkoutItems: number;
@@ -39,6 +46,7 @@ type State = {
   favorites: any;
   editMode: boolean;
   currentOrder: Array<CurrentOrder>;
+  userInfo: any
 };
 
 type Action = {
@@ -48,6 +56,7 @@ type Action = {
   updateFavorites: (favorites: State["favorites"]) => void;
   setEditMode: (editMode: State["editMode"]) => void;
   setCurrentOrder: (currentOrder: State["currentOrder"]) => void;
+  setUserInfo: (userInfo: State["userInfo"]) => void;
 };
 
 // Create your store, which includes both state and (optionally) actions
@@ -58,6 +67,10 @@ export const useAppStore = create<State & Action>((set) => ({
   favorites: [],
   editMode: false,
   currentOrder: [],
+  userInfo: {emailAddress: '',
+    fullName: '',
+    accountCreated: '',
+    lastLoggedIn: ''},
   updateProductSelect: (productSelect) =>
     set(() => ({ productSelect: productSelect })),
   updateCheckoutItems: (checkoutItems) =>
@@ -67,4 +80,5 @@ export const useAppStore = create<State & Action>((set) => ({
   setEditMode: (editMode) => set(() => ({ editMode: editMode })),
   setCurrentOrder: (currentOrder: Array<CurrentOrder>) =>
     set(() => ({ currentOrder: currentOrder })),
+  setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),
 }));

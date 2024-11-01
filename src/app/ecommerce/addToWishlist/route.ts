@@ -8,6 +8,7 @@ export async function POST(request: any) {
       },
       body: JSON.stringify(await request.json()),
     });
+    console.log('addProductToWishlist', addProductToWishlist);
     if (!addProductToWishlist.ok) {
       throw new Error(`Error from external API: ${addProductToWishlist.statusText}`);
     }

@@ -80,10 +80,7 @@ export default function Login() {
   return (
     <div className={styles.mfaContainer}>
       <h3>Multi Factor Authentication</h3>
-      <p>
-        Enter below the 6-digit authentication sent to your phone number ending
-        with ****
-      </p>
+      <p>Enter below the 6-digit authentication sent to your email address</p>
       {mfaError && (
         <Typography sx={{ color: "red" }}>
           Please enter a valid 6-digit code

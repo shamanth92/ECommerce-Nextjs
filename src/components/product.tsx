@@ -30,6 +30,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const checkoutItems = useAppStore((state) => state.checkoutItems);
   const itemsInCart = useAppStore((state) => state.itemsInCart);
   const favorites = useAppStore((state) => state.favorites);
+  const userInfo = useAppStore((state) => state.userInfo);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const updateFavorites = useAppStore((state) => state.updateFavorites);
@@ -37,7 +38,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   useEffect(() => {
     const getFavorites = async () => {
       const response = await fetch(
-        "/ecommerce/addToWishlist?email=rafa@abc.com"
+        `/ecommerce/addToWishlist?email=${userInfo.emailAddress}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -49,7 +50,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       }
     };
     getFavorites();
-  }, [favorites, productDetails.id]);
+  }, [productDetails.id, userInfo.emailAddress]);
 
   const addItemToFavorites = async () => {
     // const isFavorite =
@@ -60,7 +61,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
     // console.log("isFavorite", isFavorite);
     if (!addToFavorites) {
       try {
-        productDetails = { ...productDetails, email: "rafa@abc.com" };
+        productDetails = { ...productDetails, email: userInfo.emailAddress };
         const res = await fetch("/ecommerce/addToWishlist", {
           method: "POST",
           headers: {
@@ -79,9 +80,9 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       //   updateFavorites([...favorites, productDetails]);
     } else {
       try {
-        productDetails = { ...productDetails, email: "rafa@abc.com" };
+        productDetails = { ...productDetails, email: userInfo.emailAddress };
         const res = await fetch(
-          `/ecommerce/addToWishlist?email=rafa@abc.com&id=${productDetails.id}`,
+          `/ecommerce/addToWishlist?email=${userInfo.emailAddress}&id=${productDetails.id}`,
           {
             method: "DELETE",
             headers: {

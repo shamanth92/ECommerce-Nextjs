@@ -18,7 +18,11 @@ import styles from "./../componentStyles/register.module.css";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { app } from "@/firebase/initialize";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 
 export default function Register() {
   const [registerUser, setRegister] = useState(false);
@@ -61,6 +65,18 @@ export default function Register() {
           showRegisterError(false);
           setLoading(false);
           const user = userCredential.user;
+          updateProfile(user, {
+            displayName: data.fullName,
+          })
+            .then(() => {
+              // Profile updated!
+              // ...
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+            });
+          console.log(user);
           reset();
         })
         .catch((error) => {

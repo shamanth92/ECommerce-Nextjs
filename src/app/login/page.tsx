@@ -7,11 +7,13 @@ import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
+import { useAppStore } from "@/zustand/store";
 
 export default function Login() {
   const [loginError, setLoginError] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const setUserInfo = useAppStore((state) => state.setUserInfo);
   type Inputs = {
     username: string;
     password: string;
@@ -38,6 +40,13 @@ export default function Login() {
       .then((userCredential) => {
         setLoginError(false);
         const user = userCredential.user;
+        console.log(user);
+        setUserInfo({
+          emailAddress: user.email,
+          fullName: user.displayName,
+          accountCreated: user.metadata.creationTime,
+          lastLoggedIn: user.metadata.lastSignInTime,
+        });
         router.push("/login/mfa");
         setLoading(false);
         reset();
