@@ -69,16 +69,20 @@ export default function Account() {
                       Member since:
                     </Typography>
                     <Typography>
-                      {DateTime.fromHTTP(userInfo.accountCreated).toFormat(
-                        "LLLL yyyy"
-                      )}
+                      {DateTime.fromMillis(parseInt(userInfo.accountCreated))
+                        .setZone("UTC")
+                        .toFormat("d LLLL yyyy")}
                     </Typography>
                   </Box>
                   <Box sx={{ padding: "10px" }}>
                     <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
                       Last Logged In Activity:
                     </Typography>
-                    <Typography>{userInfo.lastLoggedIn}</Typography>
+                    <Typography>
+                      {DateTime.fromMillis(parseInt(userInfo.lastLoggedIn))
+                        .toUTC()
+                        .toFormat("EEE, dd LLL yyyy HH:mm:ss 'GMT'")}
+                    </Typography>
                   </Box>
                 </Box>
               </CardContent>

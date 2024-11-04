@@ -52,39 +52,29 @@ export default function Register() {
       confirmpassword: "",
     },
   });
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (data.password === data.confirmpassword) {
       clearErrors("confirmpassword");
       setLoading(true);
-      const auth = getAuth(app);
-      createUserWithEmailAndPassword(auth, data.email, data.password)
-        .then((userCredential) => {
-          // Signed up
+      try {
+        const response = await fetch(
+          `/ecommerce/auth/register?email=${data.email}&password=${data.password}&fullName=${data.fullName}`
+        );
+        if (response.ok) {
+          const registerRes = await response.json();
           setShowSnackbar(true);
           setRegister(false);
           showRegisterError(false);
           setLoading(false);
-          const user = userCredential.user;
-          updateProfile(user, {
-            displayName: data.fullName,
-          })
-            .then(() => {
-              // Profile updated!
-              // ...
-            })
-            .catch((error) => {
-              // An error occurred
-              // ...
-            });
-          console.log(user);
           reset();
-        })
-        .catch((error) => {
+        } else {
           setLoading(false);
           showRegisterError(true);
-          const errorCode = error.code;
-          const errorMessage = error.message;
-        });
+        }
+      } catch (error) {
+        setLoading(false);
+        showRegisterError(true);
+      }
     } else {
       setError("confirmpassword", {
         type: "manual",
@@ -160,6 +150,7 @@ export default function Register() {
                     label="Password"
                     fullWidth
                     variant="outlined"
+                    type="password"
                     error={errors.password ? true : false}
                     helperText={errors.password ? errors.password.message : ""}
                   />
@@ -178,6 +169,7 @@ export default function Register() {
                     label="Confirm Password"
                     fullWidth
                     variant="outlined"
+                    type="password"
                     error={errors.confirmpassword ? true : false}
                     helperText={
                       errors.confirmpassword

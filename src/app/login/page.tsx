@@ -32,37 +32,39 @@ export default function Login() {
       password: "",
     },
   });
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoginError(false);
     setLoading(true);
-    const auth = getAuth();
-    // setTimeout(() => {
-    signInWithEmailAndPassword(auth, data.username, data.password)
-      .then(async (userCredential) => {
+    try {
+      const response = await fetch(
+        `/ecommerce/auth/login?email=${data.username}&password=${data.password}`
+      );
+      if (response.ok) {
+        const loginRes = await response.json();
+        console.log(loginRes);
         setLoginError(false);
-        const user = userCredential.user;
-        console.log(await user.getIdToken());
-        setCookie("token", user.email, {
+        setCookie("token", loginRes.email, {
           maxAge: 3600,
           path: "/",
         });
         setUserInfo({
-          emailAddress: user.email,
-          fullName: user.displayName,
-          accountCreated: user.metadata.creationTime,
-          lastLoggedIn: user.metadata.lastSignInTime,
+          emailAddress: loginRes.email,
+          fullName: loginRes.displayName,
+          accountCreated: loginRes.createdAt,
+          lastLoggedIn: loginRes.lastLoginAt,
         });
         router.push("/login/mfa");
         setLoading(false);
         reset();
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+      } else {
         setLoading(false);
         setLoginError(true);
-      });
-    // }, 1000);
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      setLoginError(true);
+    }
   };
 
   return (
@@ -99,6 +101,7 @@ export default function Login() {
                     label="Password"
                     fullWidth
                     variant="outlined"
+                    type="password"
                     error={errors.password ? true : false}
                     helperText={errors.password ? errors.password.message : ""}
                   />
