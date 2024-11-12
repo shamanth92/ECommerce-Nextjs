@@ -41,21 +41,51 @@ export default function Login() {
       );
       if (response.ok) {
         const loginRes = await response.json();
-        console.log(loginRes);
         setLoginError(false);
-        setCookie("token", loginRes.email, {
-          maxAge: 3600,
-          path: "/",
-        });
         setUserInfo({
           emailAddress: loginRes.email,
           fullName: loginRes.displayName,
           accountCreated: loginRes.createdAt,
           lastLoggedIn: loginRes.lastLoginAt,
         });
-        router.push("/login/mfa");
-        setLoading(false);
-        reset();
+        const userResponse = await fetch(
+          `/ecommerce/account/user?email=${loginRes.email}`
+        );
+        if (userResponse.ok) {
+          const data = await userResponse.json();
+          console.log("data: ", data);
+          if (Object.keys(data).length === 0) {
+            const saveAccount = await fetch(`/ecommerce/account/user`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                emailAddress: loginRes.email,
+                fullName: loginRes.displayName,
+                accountCreated: loginRes.createdAt,
+                lastLoggedIn: loginRes.lastLoginAt,
+              }),
+            });
+            if (saveAccount.ok) {
+              setCookie("token", loginRes.email, {
+                maxAge: 3600,
+                path: "/",
+              });
+              router.push("/login/mfa");
+              setLoading(false);
+              reset();
+            }
+          } else {
+            setCookie("token", loginRes.email, {
+              maxAge: 3600,
+              path: "/",
+            });
+            router.push("/login/mfa");
+            setLoading(false);
+            reset();
+          }
+        }
       } else {
         setLoading(false);
         setLoginError(true);

@@ -1,6 +1,6 @@
 "use client";
 import { Tabs, Tab, Box, Typography, CardContent, Card } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./account.module.css";
 import SavedAddress from "@/components/savedAddress";
 import PaymentMethods from "@/components/paymentMethods";
@@ -11,11 +11,26 @@ import { DateTime } from "luxon";
 
 export default function Account() {
   const [tabIndex, setTabIndex] = useState(0);
+  const [account, setAccount] = useState(null);
   const userInfo = useAppStore((state) => state.userInfo);
 
   const updateTab = (e: any, v: number) => {
     setTabIndex(v);
   };
+
+  useEffect(() => {
+    const getAccount = async () => {
+      const response = await fetch(
+        `/ecommerce/account/user?email=${userInfo.emailAddress}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log("data: ", data);
+        setAccount(data);
+      }
+    };
+    getAccount();
+  }, [userInfo.emailAddress]);
 
   return (
     <>
