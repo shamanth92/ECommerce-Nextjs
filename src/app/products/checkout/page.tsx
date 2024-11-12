@@ -34,6 +34,7 @@ export default function Checkout() {
   const editMode = useAppStore((state) => state.editMode);
   const userInfo = useAppStore((state) => state.userInfo);
   const setCurrentOrder = useAppStore((state) => state.setCurrentOrder);
+  const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const methods = useForm({
     defaultValues: {
       deliveryType: "standard",
@@ -76,6 +77,8 @@ export default function Checkout() {
     }
   };
 
+  console.log(itemsInCart);
+
   const onSubmit = (data: any) => {
     console.log(data);
     // router.push("/products/payment");
@@ -98,6 +101,25 @@ export default function Checkout() {
       setCurrentOrder([...currentOrder, itemsOrdered]);
     }
   };
+
+  useEffect(() => {
+    const getCartItems = async () => {
+      const response = await fetch(
+        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`
+      );
+      if (response.ok) {
+        const data: any = await response.json();
+        console.log(data);
+        let items: any = [];
+        data.forEach((d: any) => {
+          items.push({ product: d, quantity: d.quantity });
+        });
+        console.log(items);
+        updateItemsInCart(items);
+      }
+    };
+    getCartItems();
+  }, []);
 
   return (
     <>

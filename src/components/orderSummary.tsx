@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 export const OrderSummary = () => {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
   const checkoutItems = useAppStore((state) => state.checkoutItems);
+  const userInfo = useAppStore((state) => state.userInfo);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const router = useRouter();
@@ -114,13 +115,31 @@ export const OrderSummary = () => {
     return price.toFixed(2);
   };
 
-  const removeItemFromCart = (productId: number) => {
+  const removeItemFromCart = async (productId: number) => {
     const deleteIndex = itemsInCart.findIndex(
       (i) => i.product.id === productId
     );
+    console.log(itemsInCart[deleteIndex].quantity, checkoutItems);
+    updateCheckoutItems(checkoutItems - itemsInCart[deleteIndex].quantity);
     itemsInCart.splice(deleteIndex, 1);
     updateItemsInCart([...itemsInCart]);
-    updateCheckoutItems(checkoutItems - 1);
+    try {
+      const res = await fetch(
+        `/ecommerce/checkoutCart?id=${productId}&email=${userInfo.emailAddress}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(await res.json());
+      if (!res.ok) {
+        throw new Error(`Failed to call API: ${res.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+    }
   };
 
   const showPrice = priceTypes.map((type) => (

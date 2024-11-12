@@ -19,7 +19,7 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import Link from "next/link";
 import { useAppStore } from "@/zustand/store";
 import { PersonAdd, Settings, Logout } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { app } from "@/firebase/initialize";
 import { getAuth, signOut } from "firebase/auth";
@@ -29,7 +29,9 @@ export const AppHeader = () => {
   const checkoutItems = useAppStore((state) => state.checkoutItems);
   const userInfo = useAppStore((state) => state.userInfo);
   const resetState = useAppStore((state) => state.resetState);
+  const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [items, setItems] = useState(0);
   const router = useRouter();
   const open = Boolean(anchorEl);
   const handleClick = (event: any) => {
@@ -65,6 +67,25 @@ export const AppHeader = () => {
     }
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    const getCartItems = async () => {
+      const response = await fetch(
+        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        let q = 0;
+        data.forEach((element: any) => {
+          console.log(element);
+          q = q + element.quantity;
+        });
+        setItems(q);
+        updateCheckoutItems(q);
+      }
+    };
+    getCartItems();
+  }, [checkoutItems]);
 
   return (
     <AppBar position="sticky">
@@ -114,7 +135,7 @@ export const AppHeader = () => {
                 <FavoriteIcon fontSize="large" color="secondary" />
               </Link>
               <Link href="/products/checkout">
-                <Badge badgeContent={checkoutItems} color="error">
+                <Badge badgeContent={items} color="error">
                   <ShoppingBagIcon fontSize="large" color="secondary" />
                 </Badge>
               </Link>

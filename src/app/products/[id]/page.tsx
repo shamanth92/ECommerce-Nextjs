@@ -18,7 +18,7 @@ export default async function SingleProduct({ params }: { params: Params }) {
 }
 
 const getProductDetails = async (id: string) => {
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+  const res = await fetch(`http://localhost:3000/ecommerce/products?id=${id}`);
 
   if (!res.ok) {
     throw new Error("Failed");

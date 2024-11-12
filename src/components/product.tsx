@@ -102,7 +102,9 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
     }
   };
 
-  const updateCheckoutIcon = () => {
+  const updateCheckoutIcon = async () => {
+    let cartItems = [];
+    let cartProducts = productDetails;
     updateCheckoutItems(
       checkoutItems === 0 ? quantity : checkoutItems + quantity
     );
@@ -110,6 +112,25 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       ...itemsInCart,
       { product: productDetails, quantity: quantity },
     ]);
+    console.log(productDetails);
+    cartProducts = { ...cartProducts, quantity: quantity };
+    cartProducts = { ...cartProducts, email: userInfo.emailAddress };
+    cartItems.push(cartProducts);
+    try {
+      const res = await fetch("/ecommerce/checkoutCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ products: cartItems }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to call API: ${res.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error calling API:", error);
+    }
   };
   return (
     <Box

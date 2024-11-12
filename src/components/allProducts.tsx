@@ -26,6 +26,7 @@ export interface Products {
   image: string;
   rating: { rate: number; count: number };
   email?: string;
+  quantity?: number;
 }
 
 export const AllProducts: React.FC<any> = ({ products }) => {
