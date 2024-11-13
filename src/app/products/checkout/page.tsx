@@ -58,7 +58,7 @@ export default function Checkout() {
       state: values.state,
       zipCode: values.zipCode,
       phoneNumber: values.phoneNumber,
-      setAsDefault: true,
+      setAsDefault: false,
     };
     try {
       const res = await fetch("/ecommerce/account/saveAddress", {

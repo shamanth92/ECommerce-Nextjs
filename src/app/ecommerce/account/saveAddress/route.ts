@@ -44,3 +44,50 @@ export async function POST(request: any) {
       return error;
     }
   }
+
+  export async function DELETE(request: any) {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const apiUrl = `http://localhost:5135/ecommerce/deleteAddress?id=${id}`;
+    try {
+      const deleteAddress = await fetch(apiUrl, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!deleteAddress.ok) {
+        throw new Error(`Error from external API: ${deleteAddress.statusText}`);
+      }
+      return new Response(JSON.stringify({ message: 'address deleted' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      return error;
+    }
+  }
+
+  export async function PUT(request: any) {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const apiUrl = `http://localhost:5135/ecommerce/updateAddress?id=${id}`;
+    try {
+      const updateAddress = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(await request.json()),
+      });
+      if (!updateAddress.ok) {
+        throw new Error(`Error from external API: ${updateAddress.statusText}`);
+      }
+      return new Response(JSON.stringify({ message: 'address updated' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (error) {
+      return error;
+    }
+  }
