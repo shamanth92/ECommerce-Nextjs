@@ -77,28 +77,63 @@ export default function Checkout() {
     }
   };
 
-  console.log(itemsInCart);
-
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log(data);
     // router.push("/products/payment");
     if (!editMode) {
       setPaymentScreen(true);
     } else {
+      // call delete cart
+      console.log(itemsInCart);
+      itemsInCart.forEach(async (item) => {
+        try {
+          const res = await fetch(
+            `/ecommerce/checkoutCart?id=${item.product.id}&email=${userInfo.emailAddress}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (!res.ok) {
+            throw new Error(`Failed to call API: ${res.statusText}`);
+          }
+        } catch (error) {
+          console.error("Error calling API:", error);
+        }
+      });
+      console.log("itemsInCart: ", itemsInCart);
       const random = Math.floor(10000 + Math.random() * 90000);
       const orderNumber = `ECOMM${random}`;
       setOrderNumber(orderNumber);
       const date = Date.now();
-      console.log(itemsInCart);
       const itemsOrdered: CurrentOrder = {
         orderNumber: orderNumber,
         dateOrdered: date.toString(),
-        status: ORDERSTATUS.Ordered,
-        product: itemsInCart,
+        orderStatus: ORDERSTATUS.Ordered,
+        products: itemsInCart,
         shippingInfo: data,
+        email: userInfo.emailAddress,
       };
+      console.log(itemsOrdered);
       setConfirmScreen(true);
-      setCurrentOrder([...currentOrder, itemsOrdered]);
+      try {
+        const res = await fetch("/ecommerce/orderSummary", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(itemsOrdered),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to call API: ${res.statusText}`);
+        }
+      } catch (error) {
+        console.error("Error calling API:", error);
+      }
+      // setCurrentOrder([...currentOrder, itemsOrdered]);
     }
   };
 

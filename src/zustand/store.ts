@@ -27,9 +27,10 @@ export interface ShippingInfo {
 export interface CurrentOrder {
   orderNumber: string;
   dateOrdered: string;
-  product: Array<ItemsInCart>;
-  status: ORDERSTATUS;
+  products: Array<ItemsInCart>;
+  orderStatus: ORDERSTATUS;
   shippingInfo: ShippingInfo;
+  email?: string;
 }
 
 export interface UserInfo {

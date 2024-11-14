@@ -17,13 +17,15 @@ import {
   Divider,
 } from "@mui/material";
 import styles from "./../componentStyles/orderHistory.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { ItemsInCart, ShippingInfo, useAppStore } from "@/zustand/store";
 import { DateTime } from "luxon";
 
 export default function OrderHistory() {
   const [openOrder, setOpenOrder] = useState(false);
+  const [orders, setOrders] = useState<any>([]);
+  const userInfo = useAppStore((state) => state.userInfo);
   const currentOrder = useAppStore((state) => state.currentOrder);
 
   console.log(currentOrder);
@@ -60,10 +62,24 @@ export default function OrderHistory() {
     return estDate;
   };
 
+  useEffect(() => {
+    const getOrderHistory = async () => {
+      const response = await fetch(
+        `/ecommerce/orderSummary?email=${userInfo.emailAddress}`
+      );
+      if (response.ok) {
+        const data: any = await response.json();
+        console.log(data);
+        setOrders(data);
+      }
+    };
+    getOrderHistory();
+  }, [userInfo.emailAddress]);
+
   return (
     <div className={styles.orderHistory}>
       <Stack spacing={3} sx={{ width: "80%" }}>
-        {currentOrder.map((order) => (
+        {orders.map((order: any) => (
           <Card key={order.orderNumber}>
             <CardContent>
               <div className={styles.orderDetailsContainer}>
@@ -91,15 +107,15 @@ export default function OrderHistory() {
                       Total Amount
                     </Typography>
                     <Typography sx={{ fontSize: "14px" }}>
-                      ${calculateTotal(order.product)}
+                      ${calculateTotal(order.products)}
                     </Typography>
                   </div>
                   <div>
                     <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                      {order.status}
+                      {order.orderStatus}
                     </Typography>
                     <Typography sx={{ fontSize: "14px" }}>
-                      {order.status === "ORDERED"
+                      {order.orderStatus === "ORDERED"
                         ? `Estimated On: ${getEstimatedDate(
                             order.shippingInfo,
                             order.dateOrdered
@@ -163,8 +179,8 @@ export default function OrderHistory() {
 
           {/* This logic is wrong */}
           <Box sx={{ marginTop: "10px" }}>
-            {currentOrder.map((orders) =>
-              orders.product.map((item) => (
+            {orders.map((orders: any) =>
+              orders.products.map((item: any) => (
                 <Box
                   key={item.product.id}
                   sx={{
