@@ -20,3 +20,11 @@
   justify-content: space-evenly;
   /* width: 15%; */
 }
+
+.codeBox {
+  width: 40%;
+}
+
+.laptopCodeBox {
+  width: 60%;
+}

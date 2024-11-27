@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useMediaQuery } from "react-responsive";
 
 interface ProductProps {
   productDetails: Products;
@@ -45,7 +46,6 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
         console.log(data);
         const isFavorite =
           data.filter((f: any) => f.id === productDetails.id).length > 0;
-        //   setFavorites(data);
         setAddToFavorites(isFavorite);
       }
     };
@@ -53,12 +53,6 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   }, [productDetails.id, userInfo.emailAddress]);
 
   const addItemToFavorites = async () => {
-    // const isFavorite =
-    //   favorites.filter((f: any) => f.id === productDetails.id).length > 0;
-    // const removeFavorite = favorites.filter(
-    //   (f: any) => f.id !== productDetails.id
-    // );
-    // console.log("isFavorite", isFavorite);
     if (!addToFavorites) {
       try {
         productDetails = { ...productDetails, email: userInfo.emailAddress };
@@ -77,7 +71,6 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       } catch (error) {
         console.error("Error calling API:", error);
       }
-      //   updateFavorites([...favorites, productDetails]);
     } else {
       try {
         productDetails = { ...productDetails, email: userInfo.emailAddress };
@@ -98,7 +91,6 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       } catch (error) {
         console.error("Error calling API:", error);
       }
-      //   updateFavorites(removeFavorite);
     }
   };
 
@@ -132,6 +124,11 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       console.error("Error calling API:", error);
     }
   };
+
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
+
   return (
     <Box
       sx={{
@@ -187,7 +184,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
                   display: "flex",
                   height: "45%",
                   justifyContent: "space-between",
-                  width: "20%",
+                  width: isDesktopOrLaptop ? "20%" : "33%",
                 }}
               >
                 <ActionButton

@@ -25,6 +25,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useMediaQuery } from "react-responsive";
 
 type ShippingInputs = {
   name: string;
@@ -227,8 +228,12 @@ export default function SavedAddress() {
     }
   };
 
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
+
   const allAddresses = address.map((p: any) => (
-    <Grid item xs={3} key={p._id}>
+    <Grid item xs={isDesktopOrLaptop ? 3 : 4} key={p._id}>
       <Card>
         <CardContent>
           <b>{p.fullName}</b>
@@ -300,7 +305,7 @@ export default function SavedAddress() {
         <DialogTitle>Add a new address</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <DialogContent>
-            <div className={styles.fields}>
+            <Box className={styles.fields}>
               <Controller
                 name="name"
                 control={control}
@@ -317,8 +322,8 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
-            <div className={styles.fields}>
+            </Box>
+            <Box className={styles.fields}>
               <Controller
                 name="email"
                 control={control}
@@ -335,8 +340,8 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
-            <div className={styles.fields}>
+            </Box>
+            <Box className={styles.fields}>
               <Controller
                 name="phoneNumber"
                 control={control}
@@ -355,8 +360,8 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
-            <div className={styles.fields}>
+            </Box>
+            <Box className={styles.fields}>
               <Controller
                 name="address"
                 control={control}
@@ -373,8 +378,8 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
-            <div className={styles.fields}>
+            </Box>
+            <Box className={styles.fields}>
               <Controller
                 name="city"
                 control={control}
@@ -390,8 +395,8 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
-            <div className={styles.fields}>
+            </Box>
+            <Box className={styles.fields}>
               <Controller
                 name="state"
                 control={control}
@@ -407,8 +412,8 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
-            <div className={styles.fields}>
+            </Box>
+            <Box className={styles.fields}>
               <Controller
                 name="zipCode"
                 control={control}
@@ -424,7 +429,7 @@ export default function SavedAddress() {
                   />
                 )}
               />
-            </div>
+            </Box>
           </DialogContent>
           <DialogActions>
             <ActionButton

@@ -1,5 +1,5 @@
 "use client";
-import { TextField, Button, Typography } from "@mui/material";
+import { TextField, Button, Typography, Box } from "@mui/material";
 import styles from "./mfa.module.css";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import { useState } from "react";
+import { useMediaQuery } from "react-responsive";
 
 export default function Login() {
   const codes = ["field1", "field2", "field3", "field4", "field5", "field6"];
@@ -77,10 +78,16 @@ export default function Login() {
     router.push("/products");
   };
 
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(max-width: 1285px)",
+  });
+
   return (
-    <div className={styles.mfaContainer}>
+    <Box className={styles.mfaContainer}>
       <h3>Multi Factor Authentication</h3>
-      <p>Enter below the 6-digit authentication sent to your email address</p>
+      <p>
+        Enter below the 6-digit authentication code sent to your email address
+      </p>
       {mfaError && (
         <Typography sx={{ color: "red" }}>
           Please enter a valid 6-digit code
@@ -89,11 +96,11 @@ export default function Login() {
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
-        style={{ width: "40%" }}
+        className={isDesktopOrLaptop ? styles.laptopCodeBox : styles.codeBox}
       >
-        <div>
-          <div className={styles.mfa}>{codeFields}</div>
-          <div className={styles.actions}>
+        <Box>
+          <Box className={styles.mfa}>{codeFields}</Box>
+          <Box className={styles.actions}>
             <ActionButton
               variant="outlined"
               label="Cancel"
@@ -106,9 +113,9 @@ export default function Login() {
               color="primary"
               type="submit"
             />
-          </div>
-        </div>
+          </Box>
+        </Box>
       </form>
-    </div>
+    </Box>
   );
 }

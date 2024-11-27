@@ -24,6 +24,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { PaymentScreen } from "@/components/paymentScreen";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import { useMediaQuery } from "react-responsive";
 
 export default function Checkout() {
   const [paymentScreen, setPaymentScreen] = useState(false);
@@ -156,6 +157,10 @@ export default function Checkout() {
     getCartItems();
   }, []);
 
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
+
   return (
     <>
       {!confirmScreen && (
@@ -216,7 +221,7 @@ export default function Checkout() {
                             marginTop: "50px",
                             display: "flex",
                             justifyContent: "space-between",
-                            width: "40%",
+                            width: isDesktopOrLaptop ? "40%" : "60%",
                             float: "right",
                           }}
                         >
@@ -229,8 +234,6 @@ export default function Checkout() {
                             }
                             color="primary"
                             type="submit"
-                            // buttonClick={() => setPaymentScreen(true)}
-                            // disabled={true}
                           />
                           <ActionButton
                             variant="contained"

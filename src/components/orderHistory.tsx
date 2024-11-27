@@ -15,12 +15,14 @@ import {
   Box,
   Avatar,
   Divider,
+  Grid,
 } from "@mui/material";
 import styles from "./../componentStyles/orderHistory.module.css";
 import { useEffect, useState } from "react";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { ItemsInCart, ShippingInfo, useAppStore } from "@/zustand/store";
 import { DateTime } from "luxon";
+import { useMediaQuery } from "react-responsive";
 
 export default function OrderHistory() {
   const [openOrder, setOpenOrder] = useState(false);
@@ -76,71 +78,85 @@ export default function OrderHistory() {
     getOrderHistory();
   }, [userInfo.emailAddress]);
 
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
+
   return (
-    <div className={styles.orderHistory}>
+    <Box className={styles.orderHistory}>
       <Stack spacing={3} sx={{ width: "80%" }}>
         {orders.map((order: any) => (
           <Card key={order.orderNumber}>
             <CardContent>
-              <div className={styles.orderDetailsContainer}>
-                <div className={styles.orderDetails}>
-                  <div>
-                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                      Order #
-                    </Typography>
-                    <Typography sx={{ fontSize: "14px" }}>
-                      {order.orderNumber}
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                      Date Ordered
-                    </Typography>
-                    <Typography sx={{ fontSize: "14px" }}>
-                      {DateTime.fromMillis(
-                        parseInt(order.dateOrdered)
-                      ).toFormat("dd-MMMM-yyyy")}
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                      Total Amount
-                    </Typography>
-                    <Typography sx={{ fontSize: "14px" }}>
-                      ${calculateTotal(order.products)}
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
-                      {order.orderStatus}
-                    </Typography>
-                    <Typography sx={{ fontSize: "14px" }}>
-                      {order.orderStatus === "ORDERED"
-                        ? `Estimated On: ${getEstimatedDate(
-                            order.shippingInfo,
-                            order.dateOrdered
-                          )}`
-                        : getEstimatedDate(
-                            order.shippingInfo,
-                            order.dateOrdered
-                          )}
-                    </Typography>
-                  </div>
-                </div>
-                <div className={styles.actionButtons}>
-                  <ActionButton
-                    variant="contained"
-                    label="View Order"
-                    color="primary"
-                    buttonClick={() => setOpenOrder(true)}
-                  />
-                  <ActionButton
-                    variant="contained"
-                    label="View Invoice"
-                    color="primary"
-                  />
-                </div>
-              </div>
+              <Grid container spacing={12}>
+                <Grid item xs={8}>
+                  <Box className={styles.orderDetails}>
+                    <Box>
+                      <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                        Order #
+                      </Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        {order.orderNumber}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                        Date Ordered
+                      </Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        {DateTime.fromMillis(
+                          parseInt(order.dateOrdered)
+                        ).toFormat("dd-MMMM-yyyy")}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                        Total Amount
+                      </Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        ${calculateTotal(order.products)}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+                        {order.orderStatus}
+                      </Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        {order.orderStatus === "ORDERED"
+                          ? `Estimated On: ${getEstimatedDate(
+                              order.shippingInfo,
+                              order.dateOrdered
+                            )}`
+                          : getEstimatedDate(
+                              order.shippingInfo,
+                              order.dateOrdered
+                            )}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+                {isDesktopOrLaptop && <Grid item xs={1}></Grid>}
+                <Grid item xs={isDesktopOrLaptop ? 3 : 4}>
+                  <Box className={styles.actionButtons}>
+                    <ActionButton
+                      variant="contained"
+                      label="View Order"
+                      color="primary"
+                      buttonClick={() => setOpenOrder(true)}
+                    />
+                    <ActionButton
+                      variant="contained"
+                      label="View Invoice"
+                      color="primary"
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+
+              {/* <Box className={styles.orderDetailsContainer}>
+               
+      
+              </Box> */}
             </CardContent>
           </Card>
         ))}
@@ -260,6 +276,6 @@ export default function OrderHistory() {
           </Box>
         </DialogContent>
       </Dialog>
-    </div>
+    </Box>
   );
 }

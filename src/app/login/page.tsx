@@ -1,6 +1,6 @@
 "use client";
 import { TextField, Box, Link, Alert, CircularProgress } from "@mui/material";
-import styles from "./login.module.css";
+import styles from "./login.module.scss";
 import Register from "@/components/register";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import { setCookie } from "cookies-next";
+import { useMediaQuery } from "react-responsive";
 
 export default function Login() {
   const [loginError, setLoginError] = useState(false);
@@ -97,13 +98,23 @@ export default function Login() {
     }
   };
 
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1285px)",
+  });
+
   return (
-    <div className={styles.container}>
-      <div className={styles.loginContainer}>
+    <Box className={styles.container}>
+      <Box className={styles.loginContainer}>
         <h3>Login to your ECommerce account</h3>
-        <div className={styles.login}>
+        <Box className={isDesktopOrLaptop ? styles.login : styles.laptopLogin}>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <div className={styles.loginFields}>
+            <Box
+              className={
+                isDesktopOrLaptop
+                  ? styles.loginFields
+                  : styles.laptopLoginFields
+              }
+            >
               <Controller
                 name="username"
                 control={control}
@@ -149,22 +160,24 @@ export default function Login() {
                   <CircularProgress />
                 </Box>
               )}
-            </div>
+            </Box>
           </form>
           {loginError && (
             <Box sx={{ paddingTop: "10px" }}>
               <Alert severity="error">Invalid Login Credentials</Alert>
             </Box>
           )}
-        </div>
-        <div className={styles.forgot}>
+        </Box>
+        <Box className={styles.forgot}>
           <Link underline="hover">Forgot Password</Link>
-        </div>
-        <div className={styles.signUp}>
+        </Box>
+        <Box
+          className={isDesktopOrLaptop ? styles.signUp : styles.laptopSignUp}
+        >
           <Register />
-        </div>
-      </div>
-      <div className={styles.image}>
+        </Box>
+      </Box>
+      <Box className={styles.image}>
         <Box
           component="img"
           height="100vh"
@@ -175,7 +188,7 @@ export default function Login() {
           alt="The house from the offer."
           src="https://images.unsplash.com/photo-1555529771-4f81423a1207?q=80&w=2030&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

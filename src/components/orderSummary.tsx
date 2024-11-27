@@ -13,6 +13,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { ItemsInCart, useAppStore } from "@/zustand/store";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "react-responsive";
 
 export const OrderSummary = () => {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
@@ -23,6 +24,10 @@ export const OrderSummary = () => {
   const router = useRouter();
 
   const priceTypes = ["Subtotal", "Taxes", "Total"];
+
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
 
   const orderSummary = itemsInCart.map((item) => (
     <Box
@@ -36,7 +41,7 @@ export const OrderSummary = () => {
       }}
     >
       <Grid container>
-        <Grid item xs={2}>
+        <Grid item xs={isDesktopOrLaptop ? 2 : 3}>
           <Box
             component="img"
             height="75px"
@@ -45,7 +50,7 @@ export const OrderSummary = () => {
             src={item.product.image}
           ></Box>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={isDesktopOrLaptop ? 8 : 7}>
           <Box
             sx={{
               display: "flex",
@@ -174,7 +179,7 @@ export const OrderSummary = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            height: "80vh",
+            height: isDesktopOrLaptop ? "80vh" : "93vh",
           }}
         >
           <InvisibleScrollbarBox>{orderSummary}</InvisibleScrollbarBox>

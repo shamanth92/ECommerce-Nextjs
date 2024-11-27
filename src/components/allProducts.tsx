@@ -12,6 +12,7 @@ import {
   CardActionArea,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "react-responsive";
 
 interface ProductsProps {
   products: [Products];
@@ -33,11 +34,17 @@ export const AllProducts: React.FC<any> = ({ products }) => {
   const productSelect = useAppStore((state) => state.productSelect);
   const updateProductSelect = useAppStore((state) => state.updateProductSelect);
   const router = useRouter();
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
 
   const allProducts = products.map((p: Products) => (
     <Grid item xs={3} key={p.id}>
       <Card
-        sx={{ height: "400px", cursor: "pointer" }}
+        sx={{
+          height: isDesktopOrLaptop ? "400px" : "335px",
+          cursor: "pointer",
+        }}
         elevation={productSelect?.id === p.id ? 10 : 2}
         onMouseEnter={() => updateProductSelect({ id: p.id })}
         onMouseLeave={() => updateProductSelect({})}
@@ -48,7 +55,7 @@ export const AllProducts: React.FC<any> = ({ products }) => {
           >
             <Box
               component="img"
-              height="280px"
+              height={isDesktopOrLaptop ? "280px" : "200px"}
               width="50%"
               alt="The house from the offer."
               src={p.image}

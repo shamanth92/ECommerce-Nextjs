@@ -12,9 +12,14 @@ import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import styles from "./help.module.css";
 import { HelpChatBot } from "@/components/HelpChatBot/helpChatBot";
 import { useState } from "react";
+import { useMediaQuery } from "react-responsive";
 
 export default function Help() {
   const [openChat, setOpenChat] = useState(false);
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1915px)",
+  });
+
   return (
     <div>
       <AppHeader />
@@ -180,7 +185,7 @@ export default function Help() {
               marginTop: "10px",
               display: "flex",
               justifyContent: "space-between",
-              width: "20%",
+              width: isDesktopOrLaptop ? "20%" : "30%",
             }}
           >
             <ActionButton
