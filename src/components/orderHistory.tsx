@@ -22,13 +22,14 @@ import { useEffect, useState } from "react";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { ItemsInCart, ShippingInfo, useAppStore } from "@/zustand/store";
 import { DateTime } from "luxon";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function OrderHistory() {
   const [openOrder, setOpenOrder] = useState(false);
   const [orders, setOrders] = useState<any>([]);
   const userInfo = useAppStore((state) => state.userInfo);
   const currentOrder = useAppStore((state) => state.currentOrder);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
 
   console.log(currentOrder);
   const calculateTotal = (products: Array<ItemsInCart>) => {
@@ -67,7 +68,12 @@ export default function OrderHistory() {
   useEffect(() => {
     const getOrderHistory = async () => {
       const response = await fetch(
-        `/ecommerce/orderSummary?email=${userInfo.emailAddress}`
+        `/ecommerce/orderSummary?email=${userInfo.emailAddress}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
+          },
+        }
       );
       if (response.ok) {
         const data: any = await response.json();
@@ -76,11 +82,9 @@ export default function OrderHistory() {
       }
     };
     getOrderHistory();
-  }, [userInfo.emailAddress]);
+  }, [userInfo.emailAddress, tokenInfo.accessToken]);
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   return (
     <Box className={styles.orderHistory}>

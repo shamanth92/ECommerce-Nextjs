@@ -12,7 +12,7 @@ import {
   CardActionArea,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface ProductsProps {
   products: [Products];
@@ -34,9 +34,7 @@ export const AllProducts: React.FC<any> = ({ products }) => {
   const productSelect = useAppStore((state) => state.productSelect);
   const updateProductSelect = useAppStore((state) => state.updateProductSelect);
   const router = useRouter();
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   const allProducts = products.map((p: Products) => (
     <Grid item xs={3} key={p.id}>

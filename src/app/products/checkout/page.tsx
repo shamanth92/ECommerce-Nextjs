@@ -24,7 +24,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { PaymentScreen } from "@/components/paymentScreen";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Checkout() {
   const [paymentScreen, setPaymentScreen] = useState(false);
@@ -34,6 +34,7 @@ export default function Checkout() {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
   const editMode = useAppStore((state) => state.editMode);
   const userInfo = useAppStore((state) => state.userInfo);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
   const setCurrentOrder = useAppStore((state) => state.setCurrentOrder);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const methods = useForm({
@@ -66,6 +67,7 @@ export default function Checkout() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenInfo.accessToken}`,
         },
         body: JSON.stringify(addressRequest),
       });
@@ -94,6 +96,7 @@ export default function Checkout() {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenInfo.accessToken}`,
               },
             }
           );
@@ -124,6 +127,7 @@ export default function Checkout() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
           },
           body: JSON.stringify(itemsOrdered),
         });
@@ -141,7 +145,12 @@ export default function Checkout() {
   useEffect(() => {
     const getCartItems = async () => {
       const response = await fetch(
-        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`
+        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
+          },
+        }
       );
       if (response.ok) {
         const data: any = await response.json();
@@ -157,9 +166,7 @@ export default function Checkout() {
     getCartItems();
   }, []);
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   return (
     <>

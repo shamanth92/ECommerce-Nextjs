@@ -10,7 +10,7 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import { useState } from "react";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Login() {
   const codes = ["field1", "field2", "field3", "field4", "field5", "field6"];
@@ -78,9 +78,7 @@ export default function Login() {
     router.push("/products");
   };
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(max-width: 1285px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   return (
     <Box className={styles.mfaContainer}>
@@ -96,7 +94,7 @@ export default function Login() {
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
-        className={isDesktopOrLaptop ? styles.laptopCodeBox : styles.codeBox}
+        className={!isDesktopOrLaptop ? styles.laptopCodeBox : styles.codeBox}
       >
         <Box>
           <Box className={styles.mfa}>{codeFields}</Box>

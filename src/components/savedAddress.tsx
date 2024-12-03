@@ -25,7 +25,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 type ShippingInputs = {
   name: string;
@@ -44,6 +44,7 @@ export default function SavedAddress() {
   const [editModeOn, setEditModeOn] = useState(false);
   const [editModeData, setEditModeData] = useState({ id: "", default: false });
   const userInfo = useAppStore((state) => state.userInfo);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
   const addAccountAddress = () => {
     console.log("adfsdfdsfsdf");
     setOpenAddress(true);
@@ -52,7 +53,12 @@ export default function SavedAddress() {
   useEffect(() => {
     const getAddresses = async () => {
       const response = await fetch(
-        `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`
+        `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -90,6 +96,7 @@ export default function SavedAddress() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
           },
           body: JSON.stringify(addressRequest),
         });
@@ -101,7 +108,12 @@ export default function SavedAddress() {
           setSaveSnackbar(true);
           reset();
           const response = await fetch(
-            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`
+            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenInfo.accessToken}`,
+              },
+            }
           );
           if (response.ok) {
             const data = await response.json();
@@ -121,6 +133,7 @@ export default function SavedAddress() {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenInfo.accessToken}`,
             },
             body: JSON.stringify(addressRequest),
           }
@@ -136,7 +149,12 @@ export default function SavedAddress() {
           setSaveSnackbar(true);
           reset();
           const response = await fetch(
-            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`
+            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenInfo.accessToken}`,
+              },
+            }
           );
           if (response.ok) {
             const data = await response.json();
@@ -157,13 +175,19 @@ export default function SavedAddress() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenInfo.accessToken}`,
         },
       });
       if (!res.ok) {
         throw new Error(`Failed to call API: ${res.statusText}`);
       } else {
         const response = await fetch(
-          `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`
+          `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenInfo.accessToken}`,
+            },
+          }
         );
         if (response.ok) {
           const data = await response.json();
@@ -201,6 +225,7 @@ export default function SavedAddress() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
           },
           body: JSON.stringify({
             id: p._id,
@@ -214,7 +239,12 @@ export default function SavedAddress() {
           throw new Error(`Failed to call API: ${res.statusText}`);
         } else {
           const response = await fetch(
-            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`
+            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+            {
+              headers: {
+                Authorization: `Bearer ${tokenInfo.accessToken}`,
+              },
+            }
           );
           if (response.ok) {
             const data = await response.json();
@@ -228,9 +258,7 @@ export default function SavedAddress() {
     }
   };
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   const allAddresses = address.map((p: any) => (
     <Grid item xs={isDesktopOrLaptop ? 3 : 4} key={p._id}>

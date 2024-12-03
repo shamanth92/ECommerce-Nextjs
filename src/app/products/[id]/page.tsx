@@ -1,6 +1,7 @@
 import { Product } from "@/components/product";
 import { AppHeader } from "@/ui-components/AppHeader/AppHeader";
 import { Products } from "@/components/allProducts";
+import { useAppStore } from "@/zustand/store";
 
 interface Params {
   id: string;

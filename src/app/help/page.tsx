@@ -12,13 +12,11 @@ import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import styles from "./help.module.css";
 import { HelpChatBot } from "@/components/HelpChatBot/helpChatBot";
 import { useState } from "react";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Help() {
   const [openChat, setOpenChat] = useState(false);
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   return (
     <div>

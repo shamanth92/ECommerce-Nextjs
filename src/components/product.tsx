@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface ProductProps {
   productDetails: Products;
@@ -32,6 +32,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
   const favorites = useAppStore((state) => state.favorites);
   const userInfo = useAppStore((state) => state.userInfo);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const updateFavorites = useAppStore((state) => state.updateFavorites);
@@ -39,7 +40,12 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   useEffect(() => {
     const getFavorites = async () => {
       const response = await fetch(
-        `/ecommerce/addToWishlist?email=${userInfo.emailAddress}`
+        `/ecommerce/addToWishlist?email=${userInfo.emailAddress}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -50,7 +56,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
       }
     };
     getFavorites();
-  }, [productDetails.id, userInfo.emailAddress]);
+  }, [productDetails.id, userInfo.emailAddress, tokenInfo.accessToken]);
 
   const addItemToFavorites = async () => {
     if (!addToFavorites) {
@@ -60,6 +66,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
           },
           body: JSON.stringify(productDetails),
         });
@@ -80,6 +87,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenInfo.accessToken}`,
             },
           }
         );
@@ -113,6 +121,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenInfo.accessToken}`,
         },
         body: JSON.stringify({ products: cartItems }),
       });
@@ -125,9 +134,7 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
     }
   };
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   return (
     <Box

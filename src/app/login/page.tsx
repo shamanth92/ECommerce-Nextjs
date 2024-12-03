@@ -9,13 +9,15 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import { setCookie } from "cookies-next";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Login() {
   const [loginError, setLoginError] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const setUserInfo = useAppStore((state) => state.setUserInfo);
+  const setAccessToken = useAppStore((state) => state.setAccessToken);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
   type Inputs = {
     username: string;
     password: string;
@@ -42,6 +44,7 @@ export default function Login() {
       );
       if (response.ok) {
         const loginRes = await response.json();
+        console.log(loginRes);
         setLoginError(false);
         setUserInfo({
           emailAddress: loginRes.email,
@@ -50,7 +53,12 @@ export default function Login() {
           lastLoggedIn: loginRes.lastLoginAt,
         });
         const userResponse = await fetch(
-          `/ecommerce/account/user?email=${loginRes.email}`
+          `/ecommerce/account/user?email=${loginRes.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${loginRes.stsTokenManager.accessToken}`,
+            },
+          }
         );
         if (userResponse.ok) {
           const data = await userResponse.json();
@@ -60,6 +68,7 @@ export default function Login() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${loginRes.stsTokenManager.accessToken}`,
               },
               body: JSON.stringify({
                 emailAddress: loginRes.email,
@@ -69,18 +78,28 @@ export default function Login() {
               }),
             });
             if (saveAccount.ok) {
-              setCookie("token", loginRes.email, {
+              setCookie("token", loginRes.stsTokenManager.accessToken, {
                 maxAge: 3600,
                 path: "/",
+              });
+              setAccessToken({
+                accessToken: loginRes.stsTokenManager.accessToken,
+                expirationTime: loginRes.stsTokenManager.expirationTime,
+                refreshToken: loginRes.stsTokenManager.refreshToken,
               });
               router.push("/login/mfa");
               setLoading(false);
               reset();
             }
           } else {
-            setCookie("token", loginRes.email, {
+            setCookie("token", loginRes.stsTokenManager.accessToken, {
               maxAge: 3600,
               path: "/",
+            });
+            setAccessToken({
+              accessToken: loginRes.stsTokenManager.accessToken,
+              expirationTime: loginRes.stsTokenManager.expirationTime,
+              refreshToken: loginRes.stsTokenManager.refreshToken,
             });
             router.push("/login/mfa");
             setLoading(false);
@@ -98,9 +117,7 @@ export default function Login() {
     }
   };
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1285px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   return (
     <Box className={styles.container}>
@@ -192,3 +209,7 @@ export default function Login() {
     </Box>
   );
 }
+
+// Store access token in cookie - done
+// Send it to every backend call
+// Verify it in the backend - done

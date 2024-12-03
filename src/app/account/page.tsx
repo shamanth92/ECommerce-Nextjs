@@ -13,6 +13,7 @@ export default function Account() {
   const [tabIndex, setTabIndex] = useState(0);
   const [account, setAccount] = useState(null);
   const userInfo = useAppStore((state) => state.userInfo);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
 
   const updateTab = (e: any, v: number) => {
     setTabIndex(v);
@@ -21,7 +22,12 @@ export default function Account() {
   useEffect(() => {
     const getAccount = async () => {
       const response = await fetch(
-        `/ecommerce/account/user?email=${userInfo.emailAddress}`
+        `/ecommerce/account/user?email=${userInfo.emailAddress}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -30,7 +36,7 @@ export default function Account() {
       }
     };
     getAccount();
-  }, [userInfo.emailAddress]);
+  }, [userInfo.emailAddress, tokenInfo.accessToken]);
 
   return (
     <>

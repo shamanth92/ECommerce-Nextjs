@@ -40,6 +40,12 @@ export interface UserInfo {
   lastLoggedIn: string;
 }
 
+interface TokenInfo {
+  accessToken: string;
+  expirationTime: number;
+  refreshToken: string;
+}
+
 type State = {
   productSelect: any;
   checkoutItems: number;
@@ -47,7 +53,8 @@ type State = {
   favorites: any;
   editMode: boolean;
   currentOrder: Array<CurrentOrder>;
-  userInfo: any
+  userInfo: any;
+  tokenInfo: TokenInfo;
 };
 
 type Action = {
@@ -59,6 +66,7 @@ type Action = {
   setCurrentOrder: (currentOrder: State["currentOrder"]) => void;
   setUserInfo: (userInfo: State["userInfo"]) => void;
   resetState: () => void;
+  setAccessToken: (accessToken: State["tokenInfo"]) => void;
 };
 
 const initialState: State = {
@@ -68,6 +76,7 @@ const initialState: State = {
   favorites: [],
   editMode: false,
   currentOrder: [],
+  tokenInfo: { accessToken: '', expirationTime: 0, refreshToken: ''},
   userInfo: {emailAddress: '',
     fullName: '',
     accountCreated: '',
@@ -87,5 +96,6 @@ export const useAppStore = create<State & Action>((set) => ({
   setCurrentOrder: (currentOrder: Array<CurrentOrder>) =>
     set(() => ({ currentOrder: currentOrder })),
   setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),
-  resetState: () => { set(initialState) }
+  resetState: () => { set(initialState) },
+  setAccessToken: (tokenInfo: TokenInfo) => set(() => ({ tokenInfo: tokenInfo })),
 }));

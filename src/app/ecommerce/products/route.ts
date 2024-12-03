@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+
 export async function GET(request: any) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -7,23 +9,28 @@ export async function GET(request: any) {
   } else {
     apiUrl = `http://localhost:5135/ecommerce/fetchproducts?id=${id}`;
   }
+  const headersList = headers();
+  const referer = headersList.get("authorization");
   console.log('apiUrl: ', apiUrl)
-  try {
-    const getProducts = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!getProducts.ok) {
-      throw new Error(`Error from external API: ${getProducts.statusText}`);
+  if (referer) {
+    try {
+      const getProducts = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": referer
+        },
+      });
+      if (!getProducts.ok) {
+        throw new Error(`Error from external API: ${getProducts.statusText}`);
+      }
+      const response = await getProducts.json();
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      return error;
     }
-    const response = await getProducts.json();
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    return error;
   }
 }

@@ -13,21 +13,20 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { ItemsInCart, useAppStore } from "@/zustand/store";
 import { useRouter } from "next/navigation";
-import { useMediaQuery } from "react-responsive";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 export const OrderSummary = () => {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
   const checkoutItems = useAppStore((state) => state.checkoutItems);
   const userInfo = useAppStore((state) => state.userInfo);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const router = useRouter();
 
   const priceTypes = ["Subtotal", "Taxes", "Total"];
 
-  const isDesktopOrLaptop = useMediaQuery({
-    query: "(min-width: 1915px)",
-  });
+  const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
   const orderSummary = itemsInCart.map((item) => (
     <Box
@@ -135,6 +134,7 @@ export const OrderSummary = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
           },
         }
       );

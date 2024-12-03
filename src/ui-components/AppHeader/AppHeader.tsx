@@ -28,6 +28,7 @@ import { deleteCookie } from "cookies-next";
 export const AppHeader = () => {
   const checkoutItems = useAppStore((state) => state.checkoutItems);
   const userInfo = useAppStore((state) => state.userInfo);
+  const tokenInfo = useAppStore((state) => state.tokenInfo);
   const resetState = useAppStore((state) => state.resetState);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -71,7 +72,12 @@ export const AppHeader = () => {
   useEffect(() => {
     const getCartItems = async () => {
       const response = await fetch(
-        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`
+        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.accessToken}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -85,7 +91,7 @@ export const AppHeader = () => {
       }
     };
     getCartItems();
-  }, [checkoutItems]);
+  }, [checkoutItems, tokenInfo.accessToken, userInfo.emailAddress]);
 
   return (
     <AppBar position="sticky">
