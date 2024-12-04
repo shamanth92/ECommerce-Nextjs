@@ -1,6 +1,6 @@
 import { Products } from "@/components/allProducts";
 import { create } from "zustand";
-
+import { persist, createJSONStorage } from 'zustand/middleware';
 export interface ItemsInCart {
   product: Products;
   quantity: number;
@@ -84,18 +84,26 @@ const initialState: State = {
 }
 
 // Create your store, which includes both state and (optionally) actions
-export const useAppStore = create<State & Action>((set) => ({
-  ...initialState,
-  updateProductSelect: (productSelect) =>
-    set(() => ({ productSelect: productSelect })),
-  updateCheckoutItems: (checkoutItems) =>
-    set(() => ({ checkoutItems: checkoutItems })),
-  updateItemsInCart: (itemsInCart) => set(() => ({ itemsInCart: itemsInCart })),
-  updateFavorites: (favorites) => set(() => ({ favorites: favorites })),
-  setEditMode: (editMode) => set(() => ({ editMode: editMode })),
-  setCurrentOrder: (currentOrder: Array<CurrentOrder>) =>
-    set(() => ({ currentOrder: currentOrder })),
-  setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),
-  resetState: () => { set(initialState) },
-  setAccessToken: (tokenInfo: TokenInfo) => set(() => ({ tokenInfo: tokenInfo })),
-}));
+export const useAppStore = create(
+  persist<State & Action>(
+    (set) => ({
+      ...initialState,
+      updateProductSelect: (productSelect) =>
+        set(() => ({ productSelect: productSelect })),
+      updateCheckoutItems: (checkoutItems) =>
+        set(() => ({ checkoutItems: checkoutItems })),
+      updateItemsInCart: (itemsInCart) => set(() => ({ itemsInCart: itemsInCart })),
+      updateFavorites: (favorites) => set(() => ({ favorites: favorites })),
+      setEditMode: (editMode) => set(() => ({ editMode: editMode })),
+      setCurrentOrder: (currentOrder: Array<CurrentOrder>) =>
+        set(() => ({ currentOrder: currentOrder })),
+      setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),
+      resetState: () => { set(initialState) },
+      setAccessToken: (tokenInfo: TokenInfo) => set(() => ({ tokenInfo: tokenInfo })),
+    }),
+    {
+      name: 'ecommerce-storage',
+      storage: createJSONStorage(() => sessionStorage)
+    }
+  )
+);
