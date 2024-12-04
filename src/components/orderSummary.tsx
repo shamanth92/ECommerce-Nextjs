@@ -14,6 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ItemsInCart, useAppStore } from "@/zustand/store";
 import { useRouter } from "next/navigation";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { mutate } from "swr";
 
 export const OrderSummary = () => {
   const itemsInCart = useAppStore((state) => state.itemsInCart);
@@ -141,6 +142,8 @@ export const OrderSummary = () => {
       console.log(await res.json());
       if (!res.ok) {
         throw new Error(`Failed to call API: ${res.statusText}`);
+      } else {
+        mutate(`/ecommerce/checkoutCart?email=${userInfo.emailAddress}`);
       }
     } catch (error) {
       console.error("Error calling API:", error);

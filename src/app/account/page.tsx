@@ -1,6 +1,6 @@
 "use client";
 import { Tabs, Tab, Box, Typography, CardContent, Card } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./account.module.css";
 import SavedAddress from "@/components/savedAddress";
 import PaymentMethods from "@/components/paymentMethods";
@@ -8,10 +8,10 @@ import OrderHistory from "@/components/orderHistory";
 import { AppHeader } from "@/ui-components/AppHeader/AppHeader";
 import { useAppStore } from "@/zustand/store";
 import { DateTime } from "luxon";
+import useSWR from "swr";
 
 export default function Account() {
   const [tabIndex, setTabIndex] = useState(0);
-  const [account, setAccount] = useState(null);
   const userInfo = useAppStore((state) => state.userInfo);
   const tokenInfo = useAppStore((state) => state.tokenInfo);
 
@@ -19,24 +19,17 @@ export default function Account() {
     setTabIndex(v);
   };
 
-  useEffect(() => {
-    const getAccount = async () => {
-      const response = await fetch(
-        `/ecommerce/account/user?email=${userInfo.emailAddress}`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenInfo.accessToken}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("data: ", data);
-        setAccount(data);
-      }
-    };
-    getAccount();
-  }, [userInfo.emailAddress, tokenInfo.accessToken]);
+  const getAccountInfo = (args: any) =>
+    fetch(args, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo.accessToken}`,
+      },
+    }).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    `/ecommerce/account/user?email=${userInfo.emailAddress}`,
+    getAccountInfo
+  );
 
   return (
     <>

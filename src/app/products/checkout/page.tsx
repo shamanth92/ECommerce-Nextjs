@@ -25,6 +25,7 @@ import { useEffect } from "react";
 import { PaymentScreen } from "@/components/paymentScreen";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import useSWR from "swr";
 
 export default function Checkout() {
   const [paymentScreen, setPaymentScreen] = useState(false);
@@ -42,6 +43,29 @@ export default function Checkout() {
       deliveryType: "standard",
     },
   });
+
+  const getCartItems = (args: any) =>
+    fetch(args, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo.accessToken}`,
+      },
+    }).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`,
+    getCartItems
+  );
+
+  useEffect(() => {
+    if (data) {
+      let items: any = [];
+      data.forEach((d: any) => {
+        items.push({ product: d, quantity: d.quantity });
+      });
+      updateItemsInCart(items);
+    }
+  }, [data, updateItemsInCart]);
+
   const router = useRouter();
 
   const fromPayment = () => {
@@ -49,8 +73,6 @@ export default function Checkout() {
   };
 
   const addAccountAddress = async () => {
-    // const hasErrors = Object.keys(methods.formState);
-    console.log("hasErrors: ", methods.getValues());
     const values: any = methods.getValues();
     const addressRequest = {
       email: userInfo.emailAddress,
@@ -81,8 +103,6 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data: any) => {
-    console.log(data);
-    // router.push("/products/payment");
     if (!editMode) {
       setPaymentScreen(true);
     } else {
@@ -141,30 +161,6 @@ export default function Checkout() {
       // setCurrentOrder([...currentOrder, itemsOrdered]);
     }
   };
-
-  useEffect(() => {
-    const getCartItems = async () => {
-      const response = await fetch(
-        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenInfo.accessToken}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data: any = await response.json();
-        console.log(data);
-        let items: any = [];
-        data.forEach((d: any) => {
-          items.push({ product: d, quantity: d.quantity });
-        });
-        console.log(items);
-        updateItemsInCart(items);
-      }
-    };
-    getCartItems();
-  }, []);
 
   const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 

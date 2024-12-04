@@ -20,6 +20,7 @@ import { useAppStore } from "@/zustand/store";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import useSWR, { mutate } from "swr";
 
 interface ProductProps {
   productDetails: Products;
@@ -35,28 +36,25 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
   const tokenInfo = useAppStore((state) => state.tokenInfo);
   const updateCheckoutItems = useAppStore((state) => state.updateCheckoutItems);
   const updateItemsInCart = useAppStore((state) => state.updateItemsInCart);
-  const updateFavorites = useAppStore((state) => state.updateFavorites);
+  const getFavorites = (args: any) =>
+    fetch(args, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo.accessToken}`,
+      },
+    }).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    `/ecommerce/addToWishlist?email=${userInfo.emailAddress}`,
+    getFavorites
+  );
 
   useEffect(() => {
-    const getFavorites = async () => {
-      const response = await fetch(
-        `/ecommerce/addToWishlist?email=${userInfo.emailAddress}`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenInfo.accessToken}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        const isFavorite =
-          data.filter((f: any) => f.id === productDetails.id).length > 0;
-        setAddToFavorites(isFavorite);
-      }
-    };
-    getFavorites();
-  }, [productDetails.id, userInfo.emailAddress, tokenInfo.accessToken]);
+    if (data) {
+      const isFavorite =
+        data.filter((f: any) => f.id === productDetails.id).length > 0;
+      setAddToFavorites(isFavorite);
+    }
+  }, [data, productDetails.id]);
 
   const addItemToFavorites = async () => {
     if (!addToFavorites) {
@@ -128,6 +126,8 @@ export const Product: React.FC<ProductProps> = ({ productDetails }) => {
 
       if (!res.ok) {
         throw new Error(`Failed to call API: ${res.statusText}`);
+      } else {
+        mutate(`/ecommerce/checkoutCart?email=${userInfo.emailAddress}`);
       }
     } catch (error) {
       console.error("Error calling API:", error);

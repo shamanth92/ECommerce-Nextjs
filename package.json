@@ -29,6 +29,7 @@
     "react-responsive": "^10.0.0",
     "sass": "^1.81.0",
     "stripe": "^16.10.0",
+    "swr": "^2.2.5",
     "zustand": "^4.5.4"
   },
   "devDependencies": {

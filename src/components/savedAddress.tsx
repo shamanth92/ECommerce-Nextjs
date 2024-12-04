@@ -16,16 +16,15 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import ClearIcon from "@mui/icons-material/Clear";
 import styles from "./../componentStyles/savedAddress.module.css";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { AccountActions } from "@/ui-components/AccountActions/AccountActions";
 import HomeIcon from "@mui/icons-material/Home";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import useSWR from "swr";
 
 type ShippingInputs = {
   name: string;
@@ -50,24 +49,17 @@ export default function SavedAddress() {
     setOpenAddress(true);
   };
 
-  useEffect(() => {
-    const getAddresses = async () => {
-      const response = await fetch(
-        `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenInfo.accessToken}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setAddress(data);
-      }
-    };
-    getAddresses();
-  }, []);
+  const getAddresses = (args: any) =>
+    fetch(args, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo.accessToken}`,
+      },
+    }).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+    getAddresses
+  );
 
   const {
     control,
@@ -260,7 +252,7 @@ export default function SavedAddress() {
 
   const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
 
-  const allAddresses = address.map((p: any) => (
+  const allAddresses = data?.map((p: any) => (
     <Grid item xs={isDesktopOrLaptop ? 3 : 4} key={p._id}>
       <Card>
         <CardContent>
@@ -287,7 +279,7 @@ export default function SavedAddress() {
 
   return (
     <>
-      {address.length === 0 ? (
+      {data && data.length === 0 ? (
         <Box
           sx={{
             display: "flex",

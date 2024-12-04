@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { app } from "@/firebase/initialize";
 import { getAuth, signOut } from "firebase/auth";
 import { deleteCookie } from "cookies-next";
+import useSWR from "swr";
 
 export const AppHeader = () => {
   const checkoutItems = useAppStore((state) => state.checkoutItems);
@@ -35,9 +36,23 @@ export const AppHeader = () => {
   const [items, setItems] = useState(0);
   const router = useRouter();
   const open = Boolean(anchorEl);
+
+  const getCartItems = (args: any) =>
+    fetch(args, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo.accessToken}`,
+      },
+    }).then((res) => res.json());
+
+  const { data, error, isLoading } = useSWR(
+    `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`,
+    getCartItems
+  );
+
   const handleClick = (event: any) => {
     setAnchorEl(event?.currentTarget);
   };
+
   const handleClose = (link: string) => {
     switch (link) {
       case "Account":
@@ -70,28 +85,16 @@ export const AppHeader = () => {
   };
 
   useEffect(() => {
-    const getCartItems = async () => {
-      const response = await fetch(
-        `/ecommerce/checkoutCart?email=${userInfo.emailAddress}`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenInfo.accessToken}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        let q = 0;
-        data.forEach((element: any) => {
-          console.log(element);
-          q = q + element.quantity;
-        });
-        setItems(q);
-        updateCheckoutItems(q);
-      }
-    };
-    getCartItems();
-  }, [checkoutItems, tokenInfo.accessToken, userInfo.emailAddress]);
+    if (data) {
+      let q = 0;
+      data.forEach((element: any) => {
+        console.log(element);
+        q = q + element.quantity;
+      });
+      setItems(q);
+      updateCheckoutItems(q);
+    }
+  }, [data, updateCheckoutItems, checkoutItems]);
 
   return (
     <AppBar position="sticky">
