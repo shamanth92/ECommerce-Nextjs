@@ -9,16 +9,11 @@ export async function GET(request: any) {
   } else {
     apiUrl = `http://localhost:5135/ecommerce/fetchproducts?id=${id}`;
   }
-  const headersList = headers();
-  const referer = headersList.get("authorization");
-  console.log('apiUrl: ', apiUrl)
-  if (referer) {
     try {
       const getProducts = await fetch(apiUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": referer
         },
       });
       if (!getProducts.ok) {
@@ -32,5 +27,4 @@ export async function GET(request: any) {
     } catch (error) {
       return error;
     }
-  }
 }

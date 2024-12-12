@@ -24,9 +24,11 @@ import { ItemsInCart, ShippingInfo, useAppStore } from "@/zustand/store";
 import { DateTime } from "luxon";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import useSWR from "swr";
+import Grid2 from "@mui/material/Unstable_Grid2";
 
 export default function OrderHistory() {
   const [openOrder, setOpenOrder] = useState(false);
+  const [viewOrder, setViewOrder] = useState<any>(null);
   const userInfo = useAppStore((state) => state.userInfo);
   const currentOrder = useAppStore((state) => state.currentOrder);
   const tokenInfo = useAppStore((state) => state.tokenInfo);
@@ -78,6 +80,12 @@ export default function OrderHistory() {
   );
 
   const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
+
+  const handleOrderSummary = (order: any) => {
+    setOpenOrder(true);
+    console.log(order);
+    setViewOrder(order);
+  };
 
   return (
     data && (
@@ -148,7 +156,7 @@ export default function OrderHistory() {
                         variant="contained"
                         label="View Order"
                         color="primary"
-                        buttonClick={() => setOpenOrder(true)}
+                        buttonClick={() => handleOrderSummary(order)}
                       />
                       <ActionButton
                         variant="contained"
@@ -158,30 +166,11 @@ export default function OrderHistory() {
                     </Box>
                   </Grid>
                 </Grid>
-
-                {/* <Box className={styles.orderDetailsContainer}>
-               
-      
-              </Box> */}
               </CardContent>
             </Card>
           ))}
         </Stack>
-        <Dialog
-          open={openOrder}
-          onClose={() => setOpenOrder(false)}
-          // PaperProps={{
-          //   component: 'form',
-          //   onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-          //     event.preventDefault();
-          //     const formData = new FormData(event.currentTarget);
-          //     const formJson = Object.fromEntries((formData as any).entries());
-          //     const email = formJson.email;
-          //     console.log(email);
-          //     handleClose();
-          //   },
-          // }}
-        >
+        <Dialog open={openOrder} onClose={() => setOpenOrder(false)}>
           <DialogTitle>Order# ABCD12345678 - Arriving by </DialogTitle>
           <DialogContent>
             <Stepper activeStep={0} alternativeLabel>
@@ -201,53 +190,47 @@ export default function OrderHistory() {
 
             {/* This logic is wrong */}
             <Box sx={{ marginTop: "10px" }}>
-              {data.map((orders: any) =>
-                orders.products.map((item: any) => (
-                  <Box
-                    key={item.product.id}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "95%;",
-                    }}
-                  >
-                    <Box>
-                      <CardMedia
-                        component="img"
-                        alt="Order"
-                        image={item.product.image}
-                        sx={{ maxWidth: "200px", height: "200px" }}
-                      ></CardMedia>
-                    </Box>
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Stack spacing={1}>
-                        <Typography
-                          sx={{ fontWeight: "bold", fontSize: "14px" }}
+              {viewOrder &&
+                viewOrder.products.map((item: any) => (
+                  <Box key={item.product.id} sx={{ padding: "15px" }}>
+                    <Grid container>
+                      <Grid item xs={4}>
+                        <Box>
+                          <CardMedia
+                            component="img"
+                            alt="Order"
+                            image={item.product.image}
+                            sx={{ maxWidth: "200px", height: "175px" }}
+                          ></CardMedia>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={1}></Grid>
+                      <Grid item xs={7}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                          }}
                         >
-                          {item.product.title}
-                        </Typography>
-                        {/* <Typography sx={{ fontSize: "14px" }}>Size: 9</Typography>
-                      <Typography sx={{ fontSize: "14px" }}>
-                        Color: Navy
-                      </Typography> */}
-                        <Typography sx={{ fontSize: "14px" }}>
-                          Quantity: {item.quantity}
-                        </Typography>
-                        <Typography sx={{ fontSize: "14px" }}>
-                          Price: ${item.product.price}
-                        </Typography>
-                      </Stack>
-                    </Box>
+                          <Stack spacing={1}>
+                            <Typography
+                              sx={{ fontWeight: "bold", fontSize: "14px" }}
+                            >
+                              {item.product.title}
+                            </Typography>
+                            <Typography sx={{ fontSize: "14px" }}>
+                              Quantity: {item.quantity}
+                            </Typography>
+                            <Typography sx={{ fontSize: "14px" }}>
+                              Price: ${item.product.price}
+                            </Typography>
+                          </Stack>
+                        </Box>
+                      </Grid>
+                    </Grid>
                   </Box>
-                ))
-              )}
+                ))}
               <Divider />
             </Box>
             <Box
@@ -261,9 +244,17 @@ export default function OrderHistory() {
                 <Typography sx={{ fontWeight: "bold" }}>
                   Shipping Address:
                 </Typography>
-                <Typography>600 N McClurg Court, APT 3110</Typography>
-                <Typography>Chicago, IL 60611</Typography>
-                <Typography>United States</Typography>
+                <Typography>
+                  {viewOrder && viewOrder.shippingInfo.address}
+                </Typography>
+                <Typography>
+                  {viewOrder &&
+                    `${viewOrder.shippingInfo.city} ${viewOrder.shippingInfo.state} ${viewOrder.shippingInfo.zipCode}`}
+                </Typography>
+                <Typography sx={{ fontWeight: "bold" }}>
+                  {viewOrder &&
+                    `${viewOrder.shippingInfo.deliveryType.toUpperCase()} Delivery`}
+                </Typography>
               </Box>
               <Box>
                 <Typography sx={{ fontWeight: "bold" }}>
