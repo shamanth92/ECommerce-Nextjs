@@ -51,7 +51,7 @@ type State = {
   checkoutItems: number;
   itemsInCart: Array<ItemsInCart>;
   favorites: any;
-  editMode: boolean;
+  // editMode: boolean;
   currentOrder: Array<CurrentOrder>;
   userInfo: any;
   tokenInfo: TokenInfo;
@@ -62,7 +62,7 @@ type Action = {
   updateCheckoutItems: (checkoutItems: State["checkoutItems"]) => void;
   updateItemsInCart: (itemsInCart: State["itemsInCart"]) => void;
   updateFavorites: (favorites: State["favorites"]) => void;
-  setEditMode: (editMode: State["editMode"]) => void;
+  // setEditMode: (editMode: State["editMode"]) => void;
   setCurrentOrder: (currentOrder: State["currentOrder"]) => void;
   setUserInfo: (userInfo: State["userInfo"]) => void;
   resetState: () => void;
@@ -74,7 +74,7 @@ const initialState: State = {
   checkoutItems: 0,
   itemsInCart: [],
   favorites: [],
-  editMode: false,
+  // editMode: false,
   currentOrder: [],
   tokenInfo: { accessToken: '', expirationTime: 0, refreshToken: ''},
   userInfo: {emailAddress: '',
@@ -94,7 +94,7 @@ export const useAppStore = create(
         set(() => ({ checkoutItems: checkoutItems })),
       updateItemsInCart: (itemsInCart) => set(() => ({ itemsInCart: itemsInCart })),
       updateFavorites: (favorites) => set(() => ({ favorites: favorites })),
-      setEditMode: (editMode) => set(() => ({ editMode: editMode })),
+      // setEditMode: (editMode) => set(() => ({ editMode: editMode })),
       setCurrentOrder: (currentOrder: Array<CurrentOrder>) =>
         set(() => ({ currentOrder: currentOrder })),
       setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),

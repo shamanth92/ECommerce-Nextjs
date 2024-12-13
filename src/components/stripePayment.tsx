@@ -1,3 +1,4 @@
+"use client";
 import { Box, Typography } from "@mui/material";
 import { PaymentElement } from "@stripe/react-stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -12,6 +13,7 @@ import {
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useAppStore } from "@/zustand/store";
+import { useRouter } from "next/navigation";
 
 interface InputProps {
   sendClick: any;
@@ -20,8 +22,9 @@ interface InputProps {
 export const StripePayment: React.FC<InputProps> = ({ sendClick }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const editMode = useAppStore((state) => state.editMode);
-  const setEditMode = useAppStore((state) => state.setEditMode);
+  const router = useRouter();
+  // const editMode = useAppStore((state) => state.editMode);
+  // const setEditMode = useAppStore((state) => state.setEditMode);
 
   const {
     control,
@@ -39,12 +42,13 @@ export const StripePayment: React.FC<InputProps> = ({ sendClick }) => {
   // save card?
 
   const goback = () => {
-    setEditMode(true);
+    // setEditMode(true);
     sendClick();
   };
 
   const onSubmit = async (event: any) => {
-    goback();
+    router.push("/products/review");
+    // goback();
     // event.preventDefault();
     // if (!stripe || !elements) {
     //   // Stripe.js hasn't yet loaded.

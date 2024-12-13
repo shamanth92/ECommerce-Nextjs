@@ -1,3 +1,4 @@
+"use client";
 import { Box, Typography } from "@mui/material";
 import { PaymentElement } from "@stripe/react-stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -11,7 +12,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { ActionButton } from "@/ui-components/ActionButton/ActionButton";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { StripePayment } from "./stripePayment";
+import { StripePayment } from "./../../../components/stripePayment";
 import { useEffect } from "react";
 
 const stripePromise: any = loadStripe("");
@@ -21,7 +22,7 @@ interface InputProps {
   onClick: any;
 }
 
-export const PaymentScreen: React.FC<InputProps> = ({ onClick }) => {
+export default function PaymentScreen() {
   //   useEffect(() => {
   //     const a = async () => {
   //       const paymentIntent = await stripe.paymentIntents.create({
@@ -39,7 +40,7 @@ export const PaymentScreen: React.FC<InputProps> = ({ onClick }) => {
   };
 
   const reviewClick = () => {
-    onClick();
+    //   onClick();
   };
 
   const {
@@ -65,4 +66,4 @@ export const PaymentScreen: React.FC<InputProps> = ({ onClick }) => {
       </Box>
     </Box>
   );
-};
+}

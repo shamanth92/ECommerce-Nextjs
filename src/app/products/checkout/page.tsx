@@ -22,7 +22,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useEffect } from "react";
-import { PaymentScreen } from "@/components/paymentScreen";
+// import { PaymentScreen } from "@/components/paymentScreen";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import useSWR from "swr";
@@ -33,7 +33,6 @@ export default function Checkout() {
   const [currentOrderNumber, setOrderNumber] = useState("");
   const currentOrder = useAppStore((state) => state.currentOrder);
   const itemsInCart = useAppStore((state) => state.itemsInCart);
-  const editMode = useAppStore((state) => state.editMode);
   const userInfo = useAppStore((state) => state.userInfo);
   const tokenInfo = useAppStore((state) => state.tokenInfo);
   const setCurrentOrder = useAppStore((state) => state.setCurrentOrder);
@@ -103,63 +102,20 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data: any) => {
-    if (!editMode) {
-      setPaymentScreen(true);
-    } else {
-      // call delete cart
-      console.log(itemsInCart);
-      itemsInCart.forEach(async (item) => {
-        try {
-          const res = await fetch(
-            `/ecommerce/checkoutCart?id=${item.product.id}&email=${userInfo.emailAddress}`,
-            {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${tokenInfo.accessToken}`,
-              },
-            }
-          );
-          if (!res.ok) {
-            throw new Error(`Failed to call API: ${res.statusText}`);
-          }
-        } catch (error) {
-          console.error("Error calling API:", error);
-        }
-      });
-      console.log("itemsInCart: ", itemsInCart);
-      const random = Math.floor(10000 + Math.random() * 90000);
-      const orderNumber = `ECOMM${random}`;
-      setOrderNumber(orderNumber);
-      const date = Date.now();
-      const itemsOrdered: CurrentOrder = {
-        orderNumber: orderNumber,
-        dateOrdered: date.toString(),
-        orderStatus: ORDERSTATUS.Ordered,
-        products: itemsInCart,
-        shippingInfo: data,
-        email: userInfo.emailAddress,
-      };
-      console.log(itemsOrdered);
-      setConfirmScreen(true);
-      try {
-        const res = await fetch("/ecommerce/orderSummary", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenInfo.accessToken}`,
-          },
-          body: JSON.stringify(itemsOrdered),
-        });
-
-        if (!res.ok) {
-          throw new Error(`Failed to call API: ${res.statusText}`);
-        }
-      } catch (error) {
-        console.error("Error calling API:", error);
-      }
-      // setCurrentOrder([...currentOrder, itemsOrdered]);
-    }
+    const random = Math.floor(10000 + Math.random() * 90000);
+    const orderNumber = `ECOMM${random}`;
+    setOrderNumber(orderNumber);
+    const date = Date.now();
+    const itemsOrdered: CurrentOrder = {
+      orderNumber: orderNumber,
+      dateOrdered: date.toString(),
+      orderStatus: ORDERSTATUS.Ordered,
+      products: itemsInCart,
+      shippingInfo: data,
+      email: userInfo.emailAddress,
+    };
+    setCurrentOrder([...currentOrder, itemsOrdered]);
+    router.push("/products/payment");
   };
 
   const isDesktopOrLaptop = useMediaQuery("(min-width:1920px)");
@@ -230,11 +186,7 @@ export default function Checkout() {
                         >
                           <ActionButton
                             variant="contained"
-                            label={
-                              editMode
-                                ? "Submit Order"
-                                : "Move to Payment Screen"
-                            }
+                            label="Move to Payment Screen"
                             color="primary"
                             type="submit"
                           />
@@ -248,9 +200,9 @@ export default function Checkout() {
                       )}
                     </form>
                   </FormProvider>
-                  {paymentScreen && !editMode && (
+                  {/* {paymentScreen && !editMode && (
                     <PaymentScreen onClick={() => fromPayment()} />
-                  )}
+                  )} */}
                 </Grid>
 
                 <Grid item xs={1}></Grid>
