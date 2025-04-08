@@ -150,7 +150,7 @@ export const AppHeader = () => {
               </Link>
             </Box>
             <IconButton onClick={handleClick}>
-              <Avatar>
+              <Avatar data-testid="avatar-icon">
                 {userInfo?.fullName !== ""
                   ? userInfo.fullName.split(" ")[0][0]
                   : ""}
