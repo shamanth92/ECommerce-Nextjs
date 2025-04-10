@@ -24,7 +24,8 @@ import { useState } from "react";
 import { useAppStore } from "@/zustand/store";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
+import { getBaseUrl } from './../../getBaseUrl';
 
 type ShippingInputs = {
   name: string;
@@ -45,7 +46,6 @@ export default function SavedAddress() {
   const userInfo = useAppStore((state) => state.userInfo);
   const tokenInfo = useAppStore((state) => state.tokenInfo);
   const addAccountAddress = () => {
-    console.log("adfsdfdsfsdf");
     setOpenAddress(true);
   };
 
@@ -57,7 +57,7 @@ export default function SavedAddress() {
     }).then((res) => res.json());
 
   const { data, error, isLoading } = useSWR(
-    `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+    `${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
     getAddresses
   );
 
@@ -84,7 +84,7 @@ export default function SavedAddress() {
     };
     if (!editModeOn) {
       try {
-        const res = await fetch("/ecommerce/account/saveAddress", {
+        const res = await fetch(`${getBaseUrl()}/ecommerce/account/saveAddress`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +100,7 @@ export default function SavedAddress() {
           setSaveSnackbar(true);
           reset();
           const response = await fetch(
-            `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+            `${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
             {
               headers: {
                 Authorization: `Bearer ${tokenInfo.accessToken}`,
@@ -109,8 +109,7 @@ export default function SavedAddress() {
           );
           if (response.ok) {
             const data = await response.json();
-            console.log(data);
-            setAddress(data);
+            mutate(`${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`, data, false);
           }
         }
       } catch (error) {
@@ -131,8 +130,6 @@ export default function SavedAddress() {
           }
         );
 
-        console.log("res: ", res);
-
         if (!res.ok) {
           throw new Error(`Failed to call API: ${res.statusText}`);
         } else {
@@ -150,8 +147,7 @@ export default function SavedAddress() {
           );
           if (response.ok) {
             const data = await response.json();
-            console.log(data);
-            setAddress(data);
+            mutate(`${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`, data, false);
           }
         }
       } catch (error) {
@@ -163,7 +159,7 @@ export default function SavedAddress() {
   const removeAddress = async (id: string) => {
     console.log(id);
     try {
-      const res = await fetch(`/ecommerce/account/saveAddress?id=${id}`, {
+      const res = await fetch(`${getBaseUrl()}/ecommerce/account/saveAddress?id=${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +170,7 @@ export default function SavedAddress() {
         throw new Error(`Failed to call API: ${res.statusText}`);
       } else {
         const response = await fetch(
-          `/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
+          `${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`,
           {
             headers: {
               Authorization: `Bearer ${tokenInfo.accessToken}`,
@@ -183,8 +179,7 @@ export default function SavedAddress() {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setAddress(data);
+          mutate(`${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`, data, false);
         }
       }
     } catch (error) {
@@ -240,8 +235,7 @@ export default function SavedAddress() {
           );
           if (response.ok) {
             const data = await response.json();
-            console.log(data);
-            setAddress(data);
+            mutate(`${getBaseUrl()}/ecommerce/account/saveAddress?email=${userInfo.emailAddress}`, data, false);
           }
         }
       } catch (error) {
@@ -330,6 +324,7 @@ export default function SavedAddress() {
                 name="name"
                 control={control}
                 rules={{ required: "Please enter a full name" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -348,6 +343,7 @@ export default function SavedAddress() {
                 name="email"
                 control={control}
                 rules={{ required: "Please enter an email address" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -366,6 +362,7 @@ export default function SavedAddress() {
                 name="phoneNumber"
                 control={control}
                 rules={{ required: "Please enter your phone number" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -386,6 +383,7 @@ export default function SavedAddress() {
                 name="address"
                 control={control}
                 rules={{ required: "Please enter your address" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -404,6 +402,7 @@ export default function SavedAddress() {
                 name="city"
                 control={control}
                 rules={{ required: "Please enter a city" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -421,6 +420,7 @@ export default function SavedAddress() {
                 name="state"
                 control={control}
                 rules={{ required: "Please select your state" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -438,6 +438,7 @@ export default function SavedAddress() {
                 name="zipCode"
                 control={control}
                 rules={{ required: "Please enter your Zip Code" }}
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
                     {...field}
